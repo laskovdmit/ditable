@@ -23,39 +23,9 @@ const showError = () => {
     }
 };
 
-const addedNewTask = (task) => {
-    return {
-        preload: task,
-        type: 'ADDED_NEW_TASK'
-    }
-};
-
-const uploadNewTask = () => {
-    return {
-        type: 'UPLOAD_NEW_TASK'
-    }
-};
-
-const failedUploadNewTask = () => {
-    return {
-        type: 'FAILED_UPLOAD_NEW_TASK'
-    }
-};
-
-const deleteTask = (id) => {
-    return {
-        type: 'DELETE_TASK',
-        preload: id
-    }
-};
-
 export {
     tasksLoaded,
     showLoading,
     showError,
-    addedNewTask,
-    uploadNewTask,
-    failedUploadNewTask,
-    deleteTask,
     hideLoading
 };

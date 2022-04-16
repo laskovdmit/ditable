@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import { Link } from 'react-router-dom';
 
 const StyledAside = styled.aside`
-    height: 100vh;
-    width: 400px;
+    height: 80px;
+    width: 100%;
 
     position: fixed;
     top: 0;
@@ -12,27 +12,16 @@ const StyledAside = styled.aside`
     z-index: 10;
 
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
 
     background-color: #fff;
     box-shadow: 0 5px 10px 0 #999;
 
-    @media (max-width: 1200px) {
-        width: 250px;
-    }
-    
-    @media (max-width: 850px) {
-        width: 100%;
-        height: 100px;
-
-        flex-direction: row;
-    }
-
     .aside__item {
-        width: 100%;
-        height: 80px;
+        width: 200px;
+        height: 100%;
 
         color: inherit;
         text-decoration: none;
@@ -43,13 +32,6 @@ const StyledAside = styled.aside`
 
         text-transform: uppercase;
         cursor: pointer;
-
-        @media (max-width: 850px) {
-            width: 200px;
-            height: 100%;
-
-            flex-direction: row;
-        }
 
         &--tasks {
             background-color: #faff60;
@@ -77,7 +59,7 @@ const StyledAside = styled.aside`
     }
 `;
 
-const Aside = () => {
+const AsideMenu = () => {
 
     return (
         <StyledAside>
@@ -87,4 +69,4 @@ const Aside = () => {
     );
 };
 
-export default Aside;
+export default AsideMenu;

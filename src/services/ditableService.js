@@ -36,8 +36,4 @@ export default class DitableService {
     async postTask(data) {
         return await this.changeData('/tasks', 'POST', data);
     }
-
-    async deleteTask(data) {
-        return await this.changeData('/tasks', 'DELETE', data);
-    }
 };

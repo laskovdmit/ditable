@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import ModalWrap from '../';
+import ModalWrap from '../../modalWrap';
 import PriorityItem from '../../priorityItem/';
 
 const ShowTaskModal = ({task, color, ...props}) => {

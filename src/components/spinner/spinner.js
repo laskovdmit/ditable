@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { StyledSpinner } from '../../styles/';
+import StyledSpinner from './spinnerStyle';
 
 const CustomStyledSpinner = styled.div`
     width: 100%;

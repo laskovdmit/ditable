@@ -2,10 +2,10 @@ import React, { useEffect, useContext, useState } from "react";
 import { connect } from "react-redux";
 import styled from 'styled-components';
 import { showLoading, showError, tasksLoaded } from '../../actions';
-import DitableServiceContext from '../ditableServiceContext';
+import { DitableServiceContext } from '../serviceContext/serviceContext';
 import Spinner from '../spinner';
 import Error from '../error';
-import TableSheet from "../tableSheet/";
+import TableSheet from "./tableSheet";
 
 const StyledTablePage = styled.div`
     height: 100vh;

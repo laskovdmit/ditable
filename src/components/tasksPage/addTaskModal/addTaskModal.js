@@ -2,9 +2,9 @@ import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
 import nextId from 'react-id-generator';
 import { connect } from 'react-redux';
-import ModalWrap from '../';
-import DitableServiceContext from '../../ditableServiceContext';
-import { addedNewTask, showLoading, showError } from '../../../actions/';
+import ModalWrap from '../../modalWrap';
+import { FirebaseServiceContext } from '../../serviceContext/serviceContext';
+import { showLoading, showError } from '../../../actions/';
 
 const StyledForm = styled.form`
     display: flex;
@@ -84,8 +84,8 @@ const StyledForm = styled.form`
     }
 `;
 
-const AddTaskModal = ({addedNewTask, showLoading, showError, loading, error, display, closedFunc, ...props}) => {
-    const ditableService = useContext(DitableServiceContext);
+const AddTaskModal = ({showLoading, showError, loading, error, display, closedFunc, ...props}) => {
+    const firebaseService = useContext(FirebaseServiceContext);
     const [title, setTitle] = useState('');
     const [descr, setDescr] = useState('');
     const [date, setDate] = useState('');
@@ -107,26 +107,13 @@ const AddTaskModal = ({addedNewTask, showLoading, showError, loading, error, dis
             completionDate: completionDate,
             priority: priority
         };
-        
-        addedNewTask(newTask);
+
+        firebaseService.postData('tasks/' + newTask.id, newTask, showError);
         setTitle('');
         setDescr('');
         setDate('');
         setPriority('1');
         closedFunc();
-
-        // ditableService.postTask(newTask)
-        //     .then(() => {
-        //         addedNewTask(newTask);
-        //         setTitle('');
-        //         setDescr('');
-        //         setDate('');
-        //         setPriority('1');
-        //     })
-        //     .catch((err) => {
-        //         showError();
-        //         throw new Error(`Ошибке при обработке запроса: ${err}`);
-        //     });
     };
 
     if (error) {
@@ -176,7 +163,6 @@ const mapStateToProps = (state) => {
 };
 
 const mapDispatchToProps = {
-    addedNewTask,
     showLoading,
     showError
 };

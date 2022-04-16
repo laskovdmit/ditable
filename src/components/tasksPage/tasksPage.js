@@ -1,10 +1,10 @@
 import React, { useContext, useEffect } from "react";
 import { connect } from "react-redux";
-import TasksList from "../tasksList";
-import AddTask from "../addTask";
+import TasksList from "./tasksList";
+import AddTask from "./addTask";
 import styled from 'styled-components';
 import { tasksLoaded, showLoading, showError } from '../../actions';
-import DitableServiceContext from '../ditableServiceContext';
+import { FirebaseServiceContext } from '../serviceContext/serviceContext';
 import Spinner from '../spinner';
 import Error from '../error';
 
@@ -13,14 +13,14 @@ const StyledTasksPage = styled.div`
 `;
 
 const TasksPage = ({tasks, loading, error, showLoading, showError, tasksLoaded}) => {
-    const ditableService = useContext(DitableServiceContext);
+    const firebaseService = useContext(FirebaseServiceContext);
     
     useEffect(() => {
         showLoading();
-
-        ditableService.getTasks()
-            .then(res => tasksLoaded(res))
-            .catch(() => showError());
+            
+        firebaseService.listenChangingData('tasks/', (newData) => {
+            tasksLoaded(newData);
+        }, showError);
     }, []);
 
     if (error) {

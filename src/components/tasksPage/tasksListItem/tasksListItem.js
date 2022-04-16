@@ -1,10 +1,10 @@
 import React, { useState, useContext } from "react";
 import styled from 'styled-components';
 import { connect } from 'react-redux';
-import PriorityItem from "../priorityItem";
-import ShowTaskModal from "../modals/showTaskModal/";
-import { deleteTask, showLoading, showError } from "../../actions";
-import DitableServiceContext from '../ditableServiceContext';
+import PriorityItem from "../../priorityItem";
+import ShowTaskModal from "../showTaskModal/";
+import { showLoading, showError } from "../../../actions";
+import { FirebaseServiceContext } from '../../serviceContext/serviceContext';
 
 const StyledTasksListItem = styled.li`
     width: 400px;
@@ -70,20 +70,17 @@ const StyledTasksListItem = styled.li`
     }
 `;
 
-const TasksListItem = ({task, deleteTask, showLoading, showError}) => {
+const TasksListItem = ({task, showLoading, showError}) => {
     const {id, title, description, completionDate, priority} = task;
+    const firebaseService =  useContext(FirebaseServiceContext);
     let color;
 
     const [display, toggleDispaly] = useState(false);
-    const ditableService = useContext(DitableServiceContext);
 
     const removeTask = () => {
-        deleteTask(id);
-        // showLoading();
+        showLoading();
 
-        // ditableService.deleteTask(task)
-        //     .then(() => deleteTask(id))
-        //     .catch(() => showError());
+        firebaseService.removeData('tasks/' + id, showError);
     };
     
     const onChangeDispaly = (e) => {
@@ -140,7 +137,6 @@ const mapStateToProps = (state) => {
 };
 
 const mapDisatchToProps = {
-    deleteTask,
     showLoading,
     showError
 }

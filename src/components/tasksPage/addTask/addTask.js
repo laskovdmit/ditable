@@ -1,6 +1,6 @@
 import React, {useState} from 'react';
 import styled from 'styled-components';
-import AddTaskModal from '../modals/addTaskModal/';
+import AddTaskModal from '../addTaskModal';
 
 
 const StyledDiv = styled.div`
