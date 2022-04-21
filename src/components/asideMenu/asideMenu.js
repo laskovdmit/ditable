@@ -9,7 +9,7 @@ const StyledAside = styled.aside`
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 10;
+    z-index: 9;
 
     display: flex;
     flex-direction: row;
@@ -30,30 +30,44 @@ const StyledAside = styled.aside`
         justify-content: center;
         align-items: center;
 
+        color: #fff;
+        font-weight: bold;
         text-transform: uppercase;
         cursor: pointer;
 
-        &--tasks {
-            background-color: #faff60;
+        &--goals {
+            background-color: #1924B1;
 
             :hover {
-                background-color: #fbff8f;
+                background-color: #4671D5;
             }
 
             :active {
-                background-color: #fcffa8;
+                background-color: #7279D8;
+            }
+        }
+
+        &--tasks {
+            background-color: #4E10AE;
+
+            :hover {
+                background-color: #7D44D6;
+            }
+
+            :active {
+                background-color: #956BD6;
             }
         }
 
         &--table {
-            background-color: #ff9c63;
+            background-color: #0969A2;
 
             :hover {
-                background-color: #ffab7a;
+                background-color: #3D9AD1;
             }
 
             :active {
-                background-color: #ffc3a1;
+                background-color: #64A8D1;
             }
         }
     }
@@ -63,6 +77,7 @@ const AsideMenu = () => {
 
     return (
         <StyledAside>
+            {/* <Link to="/goals" className="aside__item aside__item--goals">Цели</Link> */}
             <Link to="/tasks" className="aside__item aside__item--tasks">Задачи</Link>
             <Link to="/table" className="aside__item aside__item--table">Таблица</Link>
         </StyledAside>

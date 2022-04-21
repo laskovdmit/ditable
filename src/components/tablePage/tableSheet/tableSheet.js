@@ -1,8 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
+import { getZero } from '../../../services/ditableService';
 
 const StyledTableSheet = styled.table`
     border-collapse: collapse;
+    background-color: #fff;
+    border: 2px solid #000;
+    flex-grow: 1;
 
     th, td {
         min-width: 200px;
@@ -17,17 +21,11 @@ const StyledTableSheet = styled.table`
 
 const TableSheet = ({columnCount, tasks}) => {
 
-    const setRowData = (count = columnCount, date, tasks) => {
-        // const rowCount = tasks.length;
-        // const columns = [];
+    const setRowData = (columns, task) => {
 
-        // for (let i = 1; i <= count; i++) {
-        //     columns.push(`Задача ${i}`);
-        // }
-
-        return tasks.map((task, i) => {
+        return columns.map(date => {
             let data = '';
-            
+
             if (task.completionDate === date) {
                 data = task.title;
             }
@@ -47,13 +45,14 @@ const TableSheet = ({columnCount, tasks}) => {
         const columns = [];
 
         for (let i = 1; i <= count; i++) {
-            columns.push(`${date.getDate() + i}.${date.getMonth() + 1}.${date.getFullYear()}`);
+            columns.push(`${getZero(date.getDate() + i)}.${getZero((date.getMonth() + 1))}.${getZero(date.getFullYear())}`);
         }
 
         return (
             <>
                 <thead>
                     <tr>
+                        <th>Название задачи</th>
                         {columns.map(date => {
                             return (
                                 <td key={`head-${date}`}>
@@ -69,7 +68,8 @@ const TableSheet = ({columnCount, tasks}) => {
                     {tasks.map((task, i) => {
                         return (
                             <tr key={`task-${i}`} data-task={`${i + 1}`}>
-                                {/* {setRowData(count, columns[], task)} */}
+                                <th>{task.title}</th>
+                                {setRowData(columns, task)}
                             </tr>
                         );
                     })}

@@ -1,5 +1,6 @@
 import React from "react";
 import styled from 'styled-components';
+import { getColour } from "../../services/ditableService";
 
 const StyledPriorityItem = styled.div`
     width: 30px;
@@ -25,8 +26,9 @@ const StyledPriorityItem = styled.div`
     }
 `;
 
-const PriorityItem = ({priority, color}) => {
+const PriorityItem = ({priority}) => {
     let before, after, all;
+    const color = getColour(priority);
 
     switch (priority) {
         case "5":

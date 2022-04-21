@@ -27,7 +27,6 @@ const GlobalStyles = createGlobalStyle`
     }
 
     body {
-        background-color: rgb(250, 255, 96);
         font-family: 'Roboto';
     }
 
@@ -37,6 +36,8 @@ const GlobalStyles = createGlobalStyle`
 
     ul {
         list-style: none;
+        margin: 0;
+        padding: 0;
     }
 `;
 

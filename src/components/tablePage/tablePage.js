@@ -2,17 +2,18 @@ import React, { useEffect, useContext, useState } from "react";
 import { connect } from "react-redux";
 import styled from 'styled-components';
 import { showLoading, showError, tasksLoaded } from '../../actions';
-import { DitableServiceContext } from '../serviceContext/serviceContext';
+import { FirebaseServiceContext } from '../serviceContext/serviceContext';
 import Spinner from '../spinner';
 import Error from '../error';
 import TableSheet from "./tableSheet";
 
 const StyledTablePage = styled.div`
-    height: 100vh;
+    flex-grow: 1;
+    height: 85vh;
     padding: 20px;
 
-    flex-grow: 1;
     overflow-x: scroll;
+    background-color: #64A8D1;
 
     .table__wrap {
         margin-bottom: 20px;
@@ -35,16 +36,16 @@ const StyledTablePage = styled.div`
 `;
 
 const TablePage = ({tasks, loading, error, showLoading, showError, tasksLoaded}) => {
-    const ditableService = useContext(DitableServiceContext);
+    const firebaseService = useContext(FirebaseServiceContext);
     const [dayCount, setDayCount] = useState(7);
     const [columnCount, setColumnCount] = useState(7);
     
     useEffect(() => {
         showLoading();
-
-        ditableService.getTasks()
-            .then(res => tasksLoaded(res))
-            .catch(() => showError());
+            
+        firebaseService.listenChangingData('tasks/', (newData) => {
+            tasksLoaded(newData);
+        }, showError);
     }, []);
 
     if (error) {

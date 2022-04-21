@@ -23,9 +23,24 @@ const showError = () => {
     }
 };
 
+const showCurrentTask = (task) => {
+    return {
+        type: 'SHOW_CURRENT_TASK',
+        preload: task
+    }
+};
+
+const closeModalTask = (task) => {
+    return {
+        type: 'CLOSE_MODAL_TASK',
+    }
+};
+
 export {
     tasksLoaded,
     showLoading,
     showError,
-    hideLoading
+    hideLoading,
+    showCurrentTask,
+    closeModalTask
 };

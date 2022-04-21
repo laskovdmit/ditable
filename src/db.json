@@ -1,47 +1,47 @@
 {
   "tasks": [
     {
-      "id": "1",
+      "id": "0",
       "title": "Выполнить задачу 64",
       "description": "Нужно ознакомиться с постановкой задачи, проанализировать, сделать и создать ПР",
       "creationDate": "02.04.2022",
-      "completionDate": "12.04.2022",
+      "completionDate": "30.04.2022",
       "priority": "4"
     },
     {
-      "id": "2",
+      "id": "1",
       "title": "Побриться",
       "description": "Побриться в первой половине дня",
       "creationDate": "02.04.2022",
-      "completionDate": "04.04.2022",
+      "completionDate": "24.04.2022",
       "priority": "1"
     },
     {
-      "id": "3",
+      "id": "2",
       "title": "Сходить в спортзал",
       "description": "Стандартная программа тренировок",
       "creationDate": "12.04.2022",
-      "completionDate": "12.04.2022",
+      "completionDate": "23.04.2022",
       "priority": "2"
     },
     {
-      "id": "4",
+      "id": "3",
       "title": "День дурака",
       "description": "Поздравить друзей",
       "creationDate": "01.04.2022",
-      "completionDate": "01.04.2022",
+      "completionDate": "19.04.2022",
       "priority": "1"
     },
     {
-      "id": "5",
+      "id": "4",
       "title": "Забронировать поезд домой",
       "description": "",
       "creationDate": "12.04.2022",
-      "completionDate": "20.04.2022",
+      "completionDate": "21.04.2022",
       "priority": "3"
     },
     {
-      "id": "6",
+      "id": "5",
       "title": "Выполнить задачу 404",
       "description": "На странице детализации по буфету нужна кнопка Отмены списаний. Кнопка нужна для ролей Админ КШП и Админ БРСК. Данную задачу необходимо сделать в наиболее срочном порядке",
       "creationDate": "12.04.2022",
@@ -49,5 +49,29 @@
       "priority": "5"
     }
   ],
-  "table": [1]
+  "goals": [
+    {
+      "id": "1",
+      "title": "Похудеть к лету",
+      "creationDate": "12.04.2022",
+      "completionDate": "01.06.2022",
+      "tasks": [
+        {
+          "id": "7",
+          "title": "Купить абонемент в спорт. зал",
+          "description": "Нужно ",
+          "creationDate": "12.04.2022",
+          "completionDate": [
+            "18.04.2022",
+            "20.04.2022",
+            "22.04.2022"
+          ],
+          "priority": "5"
+        }
+      ]
+    },
+    {
+
+    }
+  ]
 }

@@ -1,10 +1,14 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import nextId from 'react-id-generator';
 import { connect } from 'react-redux';
 import ModalWrap from '../../modalWrap';
 import { FirebaseServiceContext } from '../../serviceContext/serviceContext';
 import { showLoading, showError } from '../../../actions/';
+import { getZero } from '../../../services/ditableService';
+import PriorityItem from '../../priorityItem/';
+import SelectPriorityItem from '../../priorityItem/selectPriorityItem';
+import { getTextPriority } from '../../../services/ditableService';
 
 const StyledForm = styled.form`
     display: flex;
@@ -82,22 +86,80 @@ const StyledForm = styled.form`
         flex-direction: column;
         flex-basis: 50%;
     }
+
+    .task__select {
+        width: 200px;
+        border: 1px solid #000;
+        border-radius: 3px;
+        padding: 5px;
+        padding-right: 30px;
+
+        position: relative;
+        cursor: pointer;
+
+        display: flex;
+        align-items: center;
+
+        p {
+            margin-left: 10px;
+        }
+
+        &::after, &::before {
+            content: "";
+            position: absolute;
+            top: 20px;
+
+            width: 10px;
+            height: 2px;
+
+            background-color: #000;
+            transition: .2s ease-in;
+        }
+
+        &::after {
+            right: 11px;
+            transform: rotate(45deg);
+        }
+
+        &::before {
+            right: 5px;
+            transform: rotate(-45deg);
+        }
+
+        &.open::after {
+            transform: rotate(135deg);
+        }
+
+        &.open::before {
+            transform: rotate(45deg);
+        }
+    }
 `;
 
-const AddTaskModal = ({showLoading, showError, loading, error, display, closedFunc, ...props}) => {
+const AddTaskModal = ({choosenDate, showLoading, showError, error, display, closedFunc, ...props}) => {
     const firebaseService = useContext(FirebaseServiceContext);
     const [title, setTitle] = useState('');
     const [descr, setDescr] = useState('');
     const [date, setDate] = useState('');
     const [priority, setPriority] = useState('1');
+    const [priorityDisplay, setPriorityDisplay] = useState(false);
+
+    useEffect(() => {
+        if (choosenDate) {
+            setDate(`${choosenDate.slice(6)}-${choosenDate.slice(3, 5)}-${choosenDate.slice(0, 2)}`);
+        }
+    }, [choosenDate]);
+
 
     const onSubmitForm = (e) => {
         e.preventDefault();
         showLoading();
 
         const today = new Date();
-        const currentDate = `${today.getDate()}.${today.getMonth() + 1}.${today.getFullYear()}`;
-        const completionDate = `${date.slice(8, 10)}.${date.slice(5, 7)}.${date.slice(0, 4)}`;
+        const currentDate = `${getZero(today.getDate())}.${getZero(today.getMonth() + 1)}.${today.getFullYear()}`;
+
+        const parseDate = new Date(Date.parse(date));
+        const completionDate = `${getZero(parseDate.getDate())}.${getZero(parseDate.getMonth() + 1)}.${parseDate.getFullYear()}`;
 
         const newTask = {
             id: nextId() + Math.floor(Math.random() * 100000),
@@ -124,30 +186,31 @@ const AddTaskModal = ({showLoading, showError, loading, error, display, closedFu
         <ModalWrap {...props} closedFunc={closedFunc} display={display} width={'500px'} height={'410px'}>
             <h2>Добавить новую задачу</h2>
             <StyledForm onSubmit={onSubmitForm}>
-                <input className="task__title" name="title" type="text" placeholder="Введите название задачи"
+                <input className="task__title" type="text" placeholder="Введите название задачи"
                     value={title}
                     onInput={(e) => setTitle(e.target.value)}/>
-                <textarea className="task__descr" name="description" type="text" placeholder="Введите описание задачи"
+                <textarea className="task__descr" type="text" placeholder="Введите описание задачи"
                     value={descr}
                     onInput={(e) => setDescr(e.target.value)}></textarea>
                 <div className="task__flex">
                     <div className="task__wrap">
                         <label htmlFor="task__date">Выполнить до:</label>
-                        <input id="task__date" className="task__date" name="completionDate" type="date"
+                        <input id="task__date" className="task__date" type="date"
                             value={date}
                             onChange={(e) => setDate(e.target.value)}/>
                     </div>
                     <div className="task__wrap">
                         <label htmlFor="task__priority">Приоритет:</label>
-                        <select id="task__priority" className="task__priority" name="priority"
-                            value={priority}
-                            onChange={(e) => setPriority(e.target.value)}>
-                            <option value="5">Очень высокий</option>
-                            <option value="4">Высокий</option>
-                            <option value="3">Средний</option>
-                            <option value="2">Ниже среднего</option>
-                            <option value="1">Низкий</option>
-                        </select>
+                        <div className={priorityDisplay ? "task__select open" : "task__select"}
+                            onClick={() => setPriorityDisplay(!priorityDisplay)}>
+                            <PriorityItem priority={priority}/>
+                            <p>{getTextPriority(priority)}</p>
+                        </div>
+                        <SelectPriorityItem
+                            setPriority={setPriority}
+                            display={priorityDisplay}
+                            setDisplay={setPriorityDisplay}
+                            top={-1}/>
                     </div>
                 </div>
                 <button className="task__btn" type="submit">Отправить</button>

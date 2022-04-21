@@ -1,45 +1,76 @@
-import React, {useState} from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import AddTaskModal from '../addTaskModal';
 
 
-const StyledDiv = styled.div`
-    width: 400px;
+const StyledBtn = styled.button`
+    width: 200px;
+    height: 40px;
+    padding: 10px;
+
+    display: block;
     margin: 0 auto;
-    margin-top: 20px;
 
-    button {
-        padding: 10px;
+    cursor: pointer;
 
-        border: 1px solid;
-        border-radius: 3px;
-        background-color: inherit;
+    background-color: #fff;
+    border: 1px solid #999;
+    border-radius: 20px;
+    box-shadow: 0 3px 5px 0 #999;
 
-        cursor: pointer;
+    :hover {
+        box-shadow: 0 5px 5px 0 #777;
+    }
 
-        &:hover {
-            box-shadow: 0 2px 5px 0 #555;
-        }
-
-        &:active {
-            box-shadow: 0 2px 5px 0 #999;
-        }
+    :active {
+        box-shadow: 0 5px 5px 0 #999;
     }
 `;
 
-const AddTask = () => {
-    const [display, toggleDispaly] = useState(false);
+const StyledOutlineBtn = styled.button`
+    border: none;
+    background-color: inherit;
+    margin-left: 5px;
+    cursor: pointer;
+
+    color: #666;
     
-    return (
-        <>
-            <StyledDiv>
-                <button
-                    type="button"
-                    onClick={() => display ? toggleDispaly(false) : toggleDispaly(true)}>Добавить задачу</button>
-            </StyledDiv>
-            <AddTaskModal display={display} closedFunc={toggleDispaly}/>
-        </>
-    );
+    :hover {
+        color: #000;
+        text-decoration: underline;
+    }
+
+    :active {
+        color: #999;
+    }
+`;
+
+const AddTask = ({display, toggleFunc, setDate, date = 0, outline}) => {
+
+    if (outline) {
+        return (
+            <StyledOutlineBtn
+                type="button"
+                outline={outline}
+                onClick={() => {
+                    display ? toggleFunc(false) : toggleFunc(true);
+                    setDate(date);
+                }}>
+                + Добавить задачу
+            </StyledOutlineBtn>
+        )
+    } else {
+        return (
+            <StyledBtn
+                type="button"
+                outline={outline}
+                onClick={() => {
+                    display ? toggleFunc(false) : toggleFunc(true);
+                    setDate(date);
+                }}>
+                + Добавить задачу
+            </StyledBtn>
+        )
+    }
 };
 
 export default AddTask;

@@ -2,14 +2,16 @@ import React, { useState, useContext } from "react";
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import PriorityItem from "../../priorityItem";
-import ShowTaskModal from "../showTaskModal/";
-import { showLoading, showError } from "../../../actions";
+import { showLoading, showError, showCurrentTask } from "../../../actions";
 import { FirebaseServiceContext } from '../../serviceContext/serviceContext';
+import { getColour } from '../../../services/ditableService';
 
 const StyledTasksListItem = styled.li`
     width: 400px;
     padding: 20px;
-    margin: 20px 0;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 20px;
 
     background-color: #ffffff;
     border: 1px solid #999;
@@ -57,6 +59,7 @@ const StyledTasksListItem = styled.li`
 
     .item__completiondate {
         padding: 5px 10px;
+        cursor: pointer;
 
         color: #fff;
         background-color: ${props => props.color};
@@ -70,64 +73,40 @@ const StyledTasksListItem = styled.li`
     }
 `;
 
-const TasksListItem = ({task, showLoading, showError}) => {
+const TasksListItem = ({task, showLoading, showError, showCurrentTask}) => {
     const {id, title, description, completionDate, priority} = task;
     const firebaseService =  useContext(FirebaseServiceContext);
-    let color;
+    const color = getColour(priority);
 
     const [display, toggleDispaly] = useState(false);
 
     const removeTask = () => {
         showLoading();
-
         firebaseService.removeData('tasks/' + id, showError);
     };
-    
-    const onChangeDispaly = (e) => {
-        if (e.target === e.currentTarget) {
-            return display ? toggleDispaly(false) : toggleDispaly(true);
-        }
-    };
 
-    switch (priority) {
-        case '5':
-            color = '#8B0000';
-            break;
-        case '4':
-            color = '#DC143C';
-            break;
-        case '3':
-            color = '#FF4500';
-            break;
-        case '2':
-            color = '#FFA500';
-            break;
-        default:
-            color = '#FA8072';
-            break;
-    }
+    const onShowModal = () => {
+        showCurrentTask(task);
+        display ? toggleDispaly(false) : toggleDispaly(true)
+    };
 
     return (
         <>
-            <StyledTasksListItem
-                color={color}
-                onClick={onChangeDispaly}>
+            <StyledTasksListItem color={color} onClick={onShowModal}>
                 <div className="item__wrap">
                     <PriorityItem
                         priority={priority}
                         color={color}/>
                     <p className="item__title">{title}</p>
                 </div>
-                {description ? <div className="item__descr">{description}</div> : null}
+                {description ?
+                    <div className="item__descr">
+                        {description.length > 40 ? description.slice(0, 39) + '...' : description}
+                    </div>
+                : null}
                 <button className="item__completiondate">{completionDate}</button>
-                <div className="item__close"
-                    onClick={removeTask}>&times;</div>
+                <div className="item__close" onClick={removeTask}>&times;</div>
             </StyledTasksListItem>
-            <ShowTaskModal
-                display={display}
-                closedFunc={toggleDispaly}
-                task={task}
-                color={color}/>
         </>
     );
 };
@@ -138,7 +117,8 @@ const mapStateToProps = (state) => {
 
 const mapDisatchToProps = {
     showLoading,
-    showError
+    showError,
+    showCurrentTask
 }
 
 export default connect(mapStateToProps, mapDisatchToProps)(TasksListItem);

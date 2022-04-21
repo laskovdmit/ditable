@@ -1,5 +1,7 @@
 const initialState = {
     tasks: [],
+    selectedTask: {},
+    modalTaskState: false,
     loading: true,
     error: false
 };
@@ -27,6 +29,18 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 loading: false,
                 error: true
+            };
+        case 'SHOW_CURRENT_TASK':
+            return {
+                ...state,
+                selectedTask: action.preload,
+                modalTaskState: true
+            };
+        case 'CLOSE_MODAL_TASK':
+            return {
+                ...state,
+                selectedTask: {},
+                modalTaskState: false
             };
         default:
             return state;
