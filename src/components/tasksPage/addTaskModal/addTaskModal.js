@@ -4,11 +4,11 @@ import nextId from 'react-id-generator';
 import { connect } from 'react-redux';
 import ModalWrap from '../../modalWrap';
 import { FirebaseServiceContext } from '../../serviceContext/serviceContext';
-import { showLoading, showError } from '../../../actions/';
+import { showLoading, hideLoading, showError, closeAddTaskModal, showStatusMessage } from '../../../actions/';
 import { getZero } from '../../../services/ditableService';
 import PriorityItem from '../../priorityItem/';
 import SelectPriorityItem from '../../priorityItem/selectPriorityItem';
-import { getTextPriority } from '../../../services/ditableService';
+import { getTextPriority, getCalendarDate } from '../../../services/ditableService';
 
 const StyledForm = styled.form`
     display: flex;
@@ -36,24 +36,15 @@ const StyledForm = styled.form`
         resize: none;
     }
     
-    .task__date, .task__priority {
+    .task__date {
         width: 150px;
-        height: 40px;
+        height: 42px;
         padding: 5px 10px;
         margin-bottom: 15px;
         margin-right: 15px;
         
         border: 1px solid #000;
         border-radius: 3px;
-    }
-
-    .task__priority {
-        width: 250px;
-
-        option {
-            display: block;
-            height: 40px;
-        }
     }
 
     .task__btn {
@@ -136,7 +127,7 @@ const StyledForm = styled.form`
     }
 `;
 
-const AddTaskModal = ({choosenDate, showLoading, showError, error, display, closedFunc, ...props}) => {
+const AddTaskModal = ({error, modalAddTaskState, showError, showLoading, hideLoading, closeAddTaskModal, showStatusMessage, choosenDate, ...props}) => {
     const firebaseService = useContext(FirebaseServiceContext);
     const [title, setTitle] = useState('');
     const [descr, setDescr] = useState('');
@@ -146,10 +137,17 @@ const AddTaskModal = ({choosenDate, showLoading, showError, error, display, clos
 
     useEffect(() => {
         if (choosenDate) {
-            setDate(`${choosenDate.slice(6)}-${choosenDate.slice(3, 5)}-${choosenDate.slice(0, 2)}`);
+            setDate(getCalendarDate(choosenDate));
         }
     }, [choosenDate]);
-
+    
+    if (!modalAddTaskState) {
+        return null;
+    }
+    
+    if (error) {
+        closeAddTaskModal();
+    }
 
     const onSubmitForm = (e) => {
         e.preventDefault();
@@ -163,6 +161,8 @@ const AddTaskModal = ({choosenDate, showLoading, showError, error, display, clos
 
         const newTask = {
             id: nextId() + Math.floor(Math.random() * 100000),
+            active: true,
+            type: "task",
             title: title,
             description: descr,
             creationDate: currentDate,
@@ -175,15 +175,18 @@ const AddTaskModal = ({choosenDate, showLoading, showError, error, display, clos
         setDescr('');
         setDate('');
         setPriority('1');
-        closedFunc();
+        closeAddTaskModal();
+        hideLoading();
+        showStatusMessage({
+            id: nextId('ssad'),
+            title: "Успех",
+            type: "success",
+            description: "Задача успешно добавлена"
+        });
     };
-
-    if (error) {
-        closedFunc(false);
-    }
-
+    
     return (
-        <ModalWrap {...props} closedFunc={closedFunc} display={display} width={'500px'} height={'410px'}>
+        <ModalWrap {...props} closedFunc={closeAddTaskModal} display={modalAddTaskState} width={'500px'} height={'410px'}>
             <h2>Добавить новую задачу</h2>
             <StyledForm onSubmit={onSubmitForm}>
                 <input className="task__title" type="text" placeholder="Введите название задачи"
@@ -221,13 +224,17 @@ const AddTaskModal = ({choosenDate, showLoading, showError, error, display, clos
 
 const mapStateToProps = (state) => {
     return {
-        error: state.error
+        error: state.error,
+        modalAddTaskState: state.modalAddTaskState
     }
 };
 
 const mapDispatchToProps = {
     showLoading,
-    showError
+    hideLoading,
+    showError,
+    closeAddTaskModal,
+    showStatusMessage
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(AddTaskModal);

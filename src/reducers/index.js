@@ -2,6 +2,8 @@ const initialState = {
     tasks: [],
     selectedTask: {},
     modalTaskState: false,
+    modalAddTaskState: false,
+    statusMessageArray: [],
     loading: true,
     error: false
 };
@@ -30,7 +32,7 @@ const reducer = (state = initialState, action) => {
                 loading: false,
                 error: true
             };
-        case 'SHOW_CURRENT_TASK':
+        case 'SHOW_MODAL_TASK':
             return {
                 ...state,
                 selectedTask: action.preload,
@@ -41,6 +43,35 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 selectedTask: {},
                 modalTaskState: false
+            };
+        case 'SHOW_ADD_TASK_MODAL':
+            return {
+                ...state,
+                modalAddTaskState: true
+            };
+        case 'CLOSE_ADD_TASK_MODAL':
+            return {
+                ...state,
+                modalAddTaskState: false
+            };
+        case 'SHOW_STATUS_MESSAGE':
+            return {
+                ...state,
+                statusMessageArray: [
+                    ...state.statusMessageArray,
+                    action.preload
+                ]
+            };
+        case 'CLOSE_STATUS_MESSAGE':
+            const id = action.preload;
+            const itemIndex = state.statusMessageArray.findIndex(item => item.id === id);
+
+            return {
+                ...state,
+                statusMessageArray: [
+                    ...state.statusMessageArray.slice(0, itemIndex),
+                    ...state.statusMessageArray.slice(itemIndex + 1)
+                ]
             };
         default:
             return state;

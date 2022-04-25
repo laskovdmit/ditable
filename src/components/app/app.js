@@ -5,6 +5,7 @@ import AsideMenu from '../asideMenu';
 // import GoalsPage from '../goalsPage';
 import TasksPage from '../tasksPage';
 import TablePage from '../tablePage';
+import StatusWrapper from '../statusMessage/statusWrapper';
 
 const StyledWrapper = styled.div`
     display: flex;
@@ -21,6 +22,7 @@ const App = () => {
                 <Route path="/tasks" element={<TasksPage/>}/>
                 <Route path="/table" element={<TablePage/>}/>
             </Routes>
+            <StatusWrapper/>
         </StyledWrapper>
     );
 };

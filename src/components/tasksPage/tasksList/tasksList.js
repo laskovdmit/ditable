@@ -1,7 +1,7 @@
 import React from "react";
 import styled from 'styled-components';
 import TasksListItem from "../tasksListItem/";
-import { getZero } from "../../../services/ditableService";
+import { getZero, filterActiveSubtasks } from "../../../services/ditableService";
 import AddTask from "../addTask";
 
 const StyledUl = styled.ul`
@@ -96,28 +96,66 @@ const getDateArray = (date, daysCount) => {
     return dateArr;
 };
 
-const TasksList = ({tasks, display, closedFunc, setDate, period}) => {
+const TasksList = ({tasks, display, openFunc, closedFunc, setDate, period, completeTask, removeTask}) => {
     const today = Date.parse(new Date());
     const dateArray = getDateArray(today, period);
-    const tasksDateArray = tasks.map(task => task.completionDate);
+    const tasksDateArray = [];
+
+    tasks.forEach(task => {
+        if (task.active) {
+            tasksDateArray.push(task.completionDate);
+        }
+        
+        if (task.subtasks) {
+            const filteredTask = filterActiveSubtasks(task);
+
+            for (let key in filteredTask.subtasks) {
+                tasksDateArray.push(filteredTask.subtasks[key].completionDate); 
+            }
+        }
+    });
 
     return (
         <StyledUl>
             {
                 dateArray.map(date => {
-                    const matchesPresentDate = tasksDateArray.filter(taskDate => taskDate === date);
-                    const isPresentDateMatch = matchesPresentDate.length !== 0 ? true : false;
+                    const matchesDate = tasksDateArray.filter(taskDate => taskDate === date);
+                    const isDateMatch = matchesDate.length !== 0 ? true : false;
 
-                    if (isPresentDateMatch) {
+                    if (isDateMatch) {
                         return (
                             <div className="tasks__item tasks__item--indicated" key={date}>
                                 <div className="tasks__date">{date}</div>
                                 {tasks.map(task => {
-                                    if (task.completionDate === date) {
-                                        return <TasksListItem key={task.id} task={task}/>
+                                    if (task.active === true && task.completionDate === date) {
+                                        return <TasksListItem key={task.id}
+                                                    task={task}
+                                                    completeTask={completeTask}
+                                                    removeTask={removeTask}/>
+                                    } else {
+                                        return null;
                                     }
                                 })}
-                                <AddTask display={display} toggleFunc={closedFunc} setDate={setDate} date={date}/>
+                                {tasks.map(task => {
+                                    if (!!task.subtasks) {
+                                        const filteredTask = filterActiveSubtasks(task);
+                                        const subtaskArray = Object.keys(filteredTask.subtasks).map(key => filteredTask.subtasks[key]);
+
+                                        return subtaskArray.map(subtask => {
+                                            if (subtask.completionDate === date) {
+                                                return <TasksListItem key={subtask.id}
+                                                            task={subtask}
+                                                            completeTask={completeTask}
+                                                            removeTask={removeTask}/>
+                                            } else {
+                                                return null;
+                                            }
+                                        })
+                                    } else {
+                                        return null;
+                                    }
+                                })}
+                                <AddTask display={display} openFunc={openFunc} closedFunc={closedFunc} setDate={setDate} date={date}/>
                             </div>
                         )
                     } else {
@@ -125,7 +163,7 @@ const TasksList = ({tasks, display, closedFunc, setDate, period}) => {
                             <div className="tasks__item" key={date}>
                                 <div className="tasks__date">
                                     {date}
-                                    <AddTask display={display} toggleFunc={closedFunc} setDate={setDate} date={date} outline/>
+                                    <AddTask display={display} openFunc={openFunc} closedFunc={closedFunc} setDate={setDate} date={date} outline/>
                                 </div>
                             </div>
                         )

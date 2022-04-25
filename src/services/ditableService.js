@@ -1,6 +1,6 @@
 const getZero = (num) => num < 10 ? `0${num}` : num;
 
-const getColour = (priority) => {
+const getColor = (priority) => {
     switch (priority) {
         case '5':
             return '#8B0000';
@@ -19,6 +19,10 @@ const getCalendarDate = (date) => {
     return `${date.slice(6)}-${date.slice(3, 5)}-${date.slice(0, 2)}`;
 };
 
+const getPostingDate = (date) => {
+    return `${getZero(date.getDate())}.${getZero(date.getMonth() + 1)}.${date.getFullYear()}`;
+};
+
 const getTextPriority = (priority) => {
     switch (priority) {
         case '5':
@@ -34,49 +38,24 @@ const getTextPriority = (priority) => {
     }
 };
 
-export {
-    getZero,
-    getColour,
-    getCalendarDate,
-    getTextPriority
-}
-
-export default class DitableService {
-    _apiBase = 'http://localhost:3000';
-
-    async getResources(url) {
-        const res = await fetch(`${this._apiBase}${url}`);
-
-        if (!res.ok) {
-            throw new Error(`Нет доступа к ${url}, статус: ${res.status}`);
+const filterActiveSubtasks = (task) => {
+    if (!!task.subtasks) {
+        const subtasks = Object.keys(task.subtasks).map(key => task.subtasks[key]);
+        const filterSubtasks = subtasks.filter(subtask => subtask.active === true);
+        return {
+            ...task,
+            subtasks: filterSubtasks
         }
-
-        return await res.json();
-    };
-
-    async changeData(url, method, data = '') {
-        const res = await fetch(`${this._apiBase}${url}`, {
-            method: method,
-            headers: {
-                'Content-type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        });
-
-        console.log(res);
-
-        if (!res.ok) {
-            throw new Error(`Нет доступа к ${url}, статус: ${res.status}`);
-        }
-
-        return await res.json();
-    }
-
-    async getTasks() {
-        return await this.getResources('/tasks');
-    }
-
-    async postTask(data) {
-        return await this.changeData('/tasks', 'POST', data);
+    } else {
+        return task;
     }
 };
+
+export {
+    getZero,
+    getColor,
+    getCalendarDate,
+    getTextPriority,
+    getPostingDate,
+    filterActiveSubtasks
+}

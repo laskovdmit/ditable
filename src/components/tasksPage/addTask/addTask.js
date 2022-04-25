@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
 
@@ -44,7 +44,7 @@ const StyledOutlineBtn = styled.button`
     }
 `;
 
-const AddTask = ({display, toggleFunc, setDate, date = 0, outline}) => {
+const AddTask = ({openFunc, setDate, date = 0, outline}) => {
 
     if (outline) {
         return (
@@ -52,7 +52,7 @@ const AddTask = ({display, toggleFunc, setDate, date = 0, outline}) => {
                 type="button"
                 outline={outline}
                 onClick={() => {
-                    display ? toggleFunc(false) : toggleFunc(true);
+                    openFunc();
                     setDate(date);
                 }}>
                 + Добавить задачу
@@ -64,7 +64,7 @@ const AddTask = ({display, toggleFunc, setDate, date = 0, outline}) => {
                 type="button"
                 outline={outline}
                 onClick={() => {
-                    display ? toggleFunc(false) : toggleFunc(true);
+                    openFunc();
                     setDate(date);
                 }}>
                 + Добавить задачу

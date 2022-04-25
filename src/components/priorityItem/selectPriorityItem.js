@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import PriorityItem from './priorityItem';
 import { getTextPriority } from '../../services/ditableService';
 
 const StyledPriority = styled.div`
     position: relative;
+    z-index: 11;
     
     .select__head, .select__item {
         display: flex;

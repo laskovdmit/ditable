@@ -1,260 +1,183 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { connect } from 'react-redux';
+import React, { useContext, useState } from 'react';
 import styled from 'styled-components';
+import { connect } from 'react-redux';
+import nextId from 'react-id-generator';
 import ModalWrap from '../../modalWrap';
-import PriorityItem from '../../priorityItem/';
-import { getColour, getCalendarDate, getZero } from '../../../services/ditableService';
-import SelectPriorityItem from '../../priorityItem/selectPriorityItem';
+import { getZero } from '../../../services/ditableService';
 import { FirebaseServiceContext } from '../../serviceContext/serviceContext';
-import { showLoading, showError } from '../../../actions/';
+import { showLoading, showError, closeModalTask, showModalTask, showStatusMessage } from '../../../actions/';
+import { getPostingDate } from '../../../services/ditableService';
+import TaskInfo from './showTasksComponents/taskInfo';
+import SubtasksInfo from './showTasksComponents/subtasksInfo';
+import AddSubtasksItem from './showTasksComponents/addSubtasksItem';
+import ParentTaskInfo from './showTasksComponents/parentTaskInfo';
 
-const StyledForm = styled.form`
-    .form__header, .form__footer {
-        margin-bottom: 10px;
-        display: flex;
-        align-items: center;
-    }
-
-    .form__priority {
-        cursor: pointer;
-        width: 40px;
-        height: 40px;
-        border-radius: 7px;
-
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        
-        &:hover {
-            background-color: #ededed;
-        }
-    }
-
-    .form__footer {
-        justify-content: space-between;
-        height: 40px;
-
-        .form__btns {
-            display: ${props => props.btnDisplay ? 'flex' : 'none'};
-        }
-    }
-
-    .form__completionDate {
-        padding: 5px 10px;
-        cursor: pointer;
-
-        color: #fff;
-        background-color: ${props => props.color};
-
-        border: 1px solid ${props => props.color};
-        border-radius: 7px;
-    }
-
-    .form__btn {
-        height: 40px;
-        padding: 5px 10px;
-        
-        color: #fff;
-        cursor: pointer;
-
-        border: none;
-        border-radius: 7px;
-
-        &--cancel {
-            width: 120px;
-            margin-right: 20px;
-            border: 2px solid #DC143C;
-            background-color: inherit;
-
-            color: #DC143C;
-
-            :hover {
-                color: #fff;
-                border: none;
-                background-color: #ed3e61;
-            }
-
-            :active  {
-                color: #fff;
-                border: none;
-                background-color: #f299ab;
-            }
-        }
-        
-        &--submit {
-            width: 150px;
-            background-color: #DC143C;
-
-            :hover {
-                background-color: #ed3e61;
-            }
-
-            :active  {
-                background-color: #f299ab;
-            }
-        }
-    }
-
-    .form__addDescr {
-        background-color: inherit;
-        margin-bottom: 10px;
-        border: none;
-        cursor: pointer;
-
-        color: #666;
-    }
-`;
-
-const StyledTextInput = styled.input`
-    width: 100%;
-    padding: 10px;
+const StyledBtn = styled.button`
+    display: block;
+    width: 200px;
+    padding: 10px 20px;
+    background-color: #32CD32;
     border: none;
     border-radius: 7px;
-    color: #000;
-
-    &::placeholder {
-        color: #000;
-    }
+    color: #fff;
+    
+    cursor: pointer;
     
     &:hover {
-        background-color: #ededed;
-        cursor: pointer;
+        background-color: #77DD77;
     }
-
-    &:focus {
-        cursor: text;
-    }
-`;
-
-const Title = styled(StyledTextInput)`
-    font-size: 20px;
-    font-weight: bold;
-
-    margin-left: 10px;
-`;
-
-const Descr = styled(StyledTextInput)`
-    margin-bottom: 10px;
-
-    &::placeholder {
-        color: #333;
+    
+    &:active {
+        background-color: #90EE90;
     }
 `;
 
-const ShowTaskModal = ({error, showError, showLoading, closedFunc, task = {}, display, ...props}) => {
+const ShowTaskModal = ({
+    error, modalTaskState, showError, showLoading, closeModalTask, showModalTask, showStatusMessage,
+    task = {}, completeTask, removeTask, ...props
+    }) => {
     const firebaseService = useContext(FirebaseServiceContext);
-    const {id, title, description, completionDate, creationDate, priority} = task;
     const isEmpty = Object.keys(task).length === 0;
-    const color = getColour(priority);
-
-    const [newTitle, setTitle] = useState('');
-    const [newDescr, setDescr] = useState('');
-    const [newDate, setDate] = useState('');
-    const [btnDisplay, setBtnDisplay] = useState(false);
-    const [newPriority, setPriority] = useState('1');
-    const [priorityDisplay, setPriorityDisplay] = useState(false);
-
-    useEffect(() => {
-        if (display) {
-            title && setTitle(title);
-            description && setDescr(description);
-            completionDate && setDate(getCalendarDate(completionDate));
-            priority && setPriority(priority);
-        } else {
-            setTitle('');
-            setDescr('');
-            setDate('');
-            setPriority('1');
-        }
-    }, [display, title, description, completionDate, priority]);
-
-    useEffect(() => {
-        if ((title !== newTitle || description !== newDescr || getCalendarDate(completionDate) !== newDate || newPriority !== priority) && 
-            (newTitle !== '' || newDescr !== '' || newDate !== '')) {
-            setBtnDisplay(true);
-        } else {
-            setBtnDisplay(false);
-        }
-
-    }, [display, title, newTitle, description, newDescr, completionDate, newDate, newPriority, priority]);
-
+    const {id, creationDate, completionDate} = task;
+    const [display, setDisplay] = useState(false);
+    
     if (isEmpty) {
         return null;
     }
-    
-    const resetData = () => {
-        setTitle(title);
-        setDescr(description);
-        setDate(getCalendarDate(completionDate));
-        setPriority(priority);
-    };
 
-    const postData = (e) => {
+    if (error) {
+        closeModalTask();
+    }
+
+    const postTaskData = (e, obj) => {
         e.preventDefault();
         showLoading();
 
-        const parseDate = new Date(Date.parse(newDate));
+        const parseDate = new Date(Date.parse(obj.newDate));
         const completionDate = `${getZero(parseDate.getDate())}.${getZero(parseDate.getMonth() + 1)}.${parseDate.getFullYear()}`;
 
         const newTask = {
             id: id,
-            title: newTitle,
-            description: newDescr,
+            active: true,
+            type: task.type,
+            title: obj.newTitle,
+            description: obj.newDescr,
             creationDate: creationDate,
             completionDate: completionDate,
-            priority: priority
+            priority: obj.newPriority
         };
 
-        firebaseService.postData('tasks/' + newTask.id, newTask, showError);
-        resetData();
-        closedFunc();
+        if (task.type === "subtask") {
+            newTask.parentId = task.parentId;
+            firebaseService.postData(`tasks/${task.parentId}/subtasks/${id}`, newTask, showError);
+            showStatusMessage({
+                id: nextId('dfbfd'),
+                title: "Успех",
+                type: "success",
+                description: "Подзадача успешно отредактирована"
+            });
+        } else {
+            newTask.subtasks = task.subtasks ? task.subtasks : [];
+            firebaseService.postData('tasks/' + id, newTask, showError);
+            showStatusMessage({
+                id: nextId('hrwq'),
+                title: "Успех",
+                type: "success",
+                description: "Задача успешно отредактирована"
+            });
+        }
+
+        closeModalTask();
+    };
+
+    const postSubtaskData = (e, obj) => {
+        e.preventDefault();
+        showLoading();
+
+        const today = new Date();
+        const currentDate = getPostingDate(today);
+
+        const parseDate = new Date(Date.parse(obj.date));
+        const completionDate = getPostingDate(parseDate);
+
+        const newTask = {
+            id: nextId() + Math.floor(Math.random() * 100000),
+            active: true,
+            type: "subtask",
+            title: obj.title,
+            description: obj.descr,
+            creationDate: currentDate,
+            completionDate: completionDate,
+            priority: obj.priority,
+            parentId: task.id
+        };
+
+        firebaseService.postData(`tasks/${task.id}/subtasks/${newTask.id}`, newTask, showError);
+        closeModalTask();
+        showStatusMessage({
+            id: nextId('ifkh'),
+            title: "Успех",
+            type: "success",
+            description: "Подзадача успешно добавлена"
+        });
+    };
+
+    const closeModal = () => {
+        closeModalTask();
+        setDisplay(false);
     };
 
     return (
-        <ModalWrap display={display} closedFunc={closedFunc} {...props}>
-            <StyledForm color={color} btnDisplay={btnDisplay} onSubmit={postData}>
-                <div className="form__header">
-                    <div>
-                        <div className="form__priority" onClick={() => setPriorityDisplay(!priorityDisplay)}>
-                            <PriorityItem
-                                priority={newPriority}
-                                color={color}/>
-                        </div>
-                        <SelectPriorityItem
-                            setPriority={setPriority}
-                            display={priorityDisplay}
-                            setDisplay={setPriorityDisplay}
-                            top={5}/>
-                        </div>
-                    <Title type="text" value={newTitle}
-                        onChange={(e) => setTitle(e.target.value)}
-                        onBlur={(e) => e.target.value === "" && setTitle(title)}/>
-                </div>
-                <Descr type="text" value={newDescr}
-                        onChange={(e) => setDescr(e.target.value)}
-                        placeholder={description ? "" : "+ Добавить описание"}/>
-                <div className="form__footer">
-                    <input className="form__completionDate" type="date"
-                        value={newDate}
-                        onChange={(e) => setDate(e.target.value)}/>
-                    <div className="form__btns">
-                        <button className="form__btn form__btn--cancel" type="button"
-                            onClick={resetData}>Отмена</button>
-                        <button className="form__btn form__btn--submit" type="submit">Сохранить</button>
-                    </div>
-                </div>
-            </StyledForm>
+        <ModalWrap display={modalTaskState} closedFunc={closeModal} {...props}>
+            <TaskInfo
+                task={task}
+                display={modalTaskState}
+                postData={postTaskData}/>
+            {task.type === 'task' ? <>
+                <SubtasksInfo
+                    task={task}
+                    display={display}
+                    setDisplay={setDisplay}
+                    closeModal={closeModal}
+                    showModal={showModalTask}/>
+                <AddSubtasksItem
+                    choosenDate={completionDate}
+                    display={display}
+                    postData={postSubtaskData}
+                    setDisplay={setDisplay}/>
+            </> : null}
+            {task.type === 'subtask' ? 
+                <ParentTaskInfo
+                    parentId={task.parentId}
+                    getParent={firebaseService.getData}
+                    closeModal={closeModal}
+                    showModal={showModalTask}/>
+            : null}
+            <StyledBtn onClick={() => {
+                completeTask(task);
+                closeModal();
+            }}>Выполнить</StyledBtn>
+            <StyledBtn onClick={() => {
+                removeTask(task);
+                closeModal();
+            }}>Удалить</StyledBtn>
         </ModalWrap>
     );
 };
 
 const mapStateToProps = (state) => {
-    return {}
+    return {
+        error: state.error,
+        modalTaskState: state.modalTaskState
+    }
 };
 
 const mapDispatchToProps = {
     showLoading,
-    showError
+    showError,
+    showModalTask,
+    closeModalTask,
+    showStatusMessage
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(ShowTaskModal);

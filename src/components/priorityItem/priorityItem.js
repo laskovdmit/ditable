@@ -1,6 +1,6 @@
 import React from "react";
 import styled from 'styled-components';
-import { getColour } from "../../services/ditableService";
+import { getColor } from "../../services/ditableService";
 
 const StyledPriorityItem = styled.div`
     width: 30px;
@@ -28,12 +28,12 @@ const StyledPriorityItem = styled.div`
 
 const PriorityItem = ({priority}) => {
     let before, after, all;
-    const color = getColour(priority);
+    const color = getColor(priority);
 
     switch (priority) {
         case "5":
             all = `
-                width: 20px;
+                width: 19px;
                 top: 8px;
                 background-color: ${color};
             `;
@@ -50,7 +50,7 @@ const PriorityItem = ({priority}) => {
             break;
         case "4":
             all = `
-                width: 20px;
+                width: 19px;
                 top: 14px;
                 background-color: ${color};
             `;
@@ -78,7 +78,7 @@ const PriorityItem = ({priority}) => {
             break;
         case "2":
             all = `
-                width: 20px;
+                width: 19px;
                 top: 14px;
                 background-color: ${color};
             `;
@@ -93,7 +93,7 @@ const PriorityItem = ({priority}) => {
             break;
         default:
             all = `
-                width: 20px;
+                width: 19px;
                 top: 8px;
                 background-color: ${color};
             `;

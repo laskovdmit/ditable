@@ -1,10 +1,9 @@
-import React, { useState, useContext } from "react";
+import React from "react";
 import styled from 'styled-components';
 import { connect } from 'react-redux';
 import PriorityItem from "../../priorityItem";
-import { showLoading, showError, showCurrentTask } from "../../../actions";
-import { FirebaseServiceContext } from '../../serviceContext/serviceContext';
-import { getColour } from '../../../services/ditableService';
+import { showModalTask } from "../../../actions";
+import { getColor } from '../../../services/ditableService';
 
 const StyledTasksListItem = styled.li`
     width: 400px;
@@ -35,6 +34,10 @@ const StyledTasksListItem = styled.li`
             font-size: 30px;
             line-height: 30px;
         }
+
+        .item__completeBtn {
+            display: block;
+        }
     }
 
     &:active {
@@ -45,6 +48,12 @@ const StyledTasksListItem = styled.li`
         display: flex;
         align-items: center;
         margin-bottom: 10px;
+    }
+
+    .item__btns {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 
     .item__title {
@@ -64,8 +73,28 @@ const StyledTasksListItem = styled.li`
         color: #fff;
         background-color: ${props => props.color};
 
-        border: 1px solid ${props => props.color};
+        border: none;
         border-radius: 3px;
+    }
+
+    .item__completeBtn {
+        display: none;
+        padding: 5px 10px;
+        cursor: pointer;
+
+        color: #fff;
+        background-color: #32CD32;
+
+        border: none;
+        border-radius: 3px;
+
+        &:hover {
+            background-color: #77DD77;
+        }
+        
+        &:active {
+            background-color: #90EE90;
+        }
     }
 
     .item__close {
@@ -73,41 +102,36 @@ const StyledTasksListItem = styled.li`
     }
 `;
 
-const TasksListItem = ({task, showLoading, showError, showCurrentTask}) => {
-    const {id, title, description, completionDate, priority} = task;
-    const firebaseService =  useContext(FirebaseServiceContext);
-    const color = getColour(priority);
+const TasksListItem = ({task, showModalTask, completeTask, removeTask}) => {
+    const {title, description, completionDate, priority} = task;
+    const color = getColor(priority);
 
-    const [display, toggleDispaly] = useState(false);
-
-    const removeTask = () => {
-        showLoading();
-        firebaseService.removeData('tasks/' + id, showError);
-    };
-
-    const onShowModal = () => {
-        showCurrentTask(task);
-        display ? toggleDispaly(false) : toggleDispaly(true)
+    const showModal = (e) => {
+        if (!e.target.classList.contains('item__close') &&
+            !e.target.classList.contains('item__completeBtn')) {
+            showModalTask(task);
+        }
     };
 
     return (
-        <>
-            <StyledTasksListItem color={color} onClick={onShowModal}>
-                <div className="item__wrap">
-                    <PriorityItem
-                        priority={priority}
-                        color={color}/>
-                    <p className="item__title">{title}</p>
+        <StyledTasksListItem color={color} onClick={showModal}>
+            <div className="item__wrap">
+                <PriorityItem
+                    priority={priority}
+                    color={color}/>
+                <p className="item__title">{title}</p>
+            </div>
+            {description ?
+                <div className="item__descr">
+                    {description.length > 40 ? description.slice(0, 39) + '...' : description}
                 </div>
-                {description ?
-                    <div className="item__descr">
-                        {description.length > 40 ? description.slice(0, 39) + '...' : description}
-                    </div>
-                : null}
+            : null}
+            <div className="item__btns">
                 <button className="item__completiondate">{completionDate}</button>
-                <div className="item__close" onClick={removeTask}>&times;</div>
-            </StyledTasksListItem>
-        </>
+                <button className="item__completeBtn" onClick={() => completeTask(task)}>Выполнить</button>
+            </div>
+            <div className="item__close" onClick={() => removeTask(task)}>&times;</div>
+        </StyledTasksListItem>
     );
 };
 
@@ -116,9 +140,7 @@ const mapStateToProps = (state) => {
 };
 
 const mapDisatchToProps = {
-    showLoading,
-    showError,
-    showCurrentTask
+    showModalTask
 }
 
 export default connect(mapStateToProps, mapDisatchToProps)(TasksListItem);

@@ -2,51 +2,103 @@
   "tasks": [
     {
       "id": "0",
+      "active": true,
+      "type": "task",
       "title": "Выполнить задачу 64",
       "description": "Нужно ознакомиться с постановкой задачи, проанализировать, сделать и создать ПР",
       "creationDate": "02.04.2022",
       "completionDate": "30.04.2022",
-      "priority": "4"
+      "priority": "4",
+      "subtasks": {
+        "0": {
+          "id": "0",
+          "active": true,
+          "type": "subtask",
+          "title": "Подзадача 1",
+          "description": "Нужно сделать эту задачууууууууууууууууууууууу уууууууууууууууууууууууууууу",
+          "creationDate": "05.04.2022",
+          "completionDate": "27.04.2022",
+          "priority": "4",
+          "parentId": "0"
+        },
+        "1": {
+          "id": "1",
+          "active": true,
+          "type": "subtask",
+          "title": "Подзадача 2",
+          "description": "Задача после основной",
+          "creationDate": "05.04.2022",
+          "completionDate": "01.05.2022",
+          "priority": "2",
+          "parentId": "0"
+        },
+        "2": {
+          "id": "2",
+          "active": true,
+          "type": "subtask",
+          "title": "Подзадача 3",
+          "description": "",
+          "creationDate": "05.04.2022",
+          "completionDate": "29.04.2022",
+          "priority": "5",
+          "parentId": "0"
+        }
+      }
     },
     {
       "id": "1",
+      "active": true,
+      "type": "task",
       "title": "Побриться",
       "description": "Побриться в первой половине дня",
       "creationDate": "02.04.2022",
-      "completionDate": "24.04.2022",
-      "priority": "1"
+      "completionDate": "02.05.2022",
+      "priority": "1",
+      "subtasks": []
     },
     {
       "id": "2",
+      "active": true,
+      "type": "task",
       "title": "Сходить в спортзал",
       "description": "Стандартная программа тренировок",
       "creationDate": "12.04.2022",
-      "completionDate": "23.04.2022",
-      "priority": "2"
+      "completionDate": "13.05.2022",
+      "priority": "2",
+      "subtasks": []
     },
     {
       "id": "3",
+      "active": true,
+      "type": "task",
       "title": "День дурака",
       "description": "Поздравить друзей",
       "creationDate": "01.04.2022",
-      "completionDate": "19.04.2022",
-      "priority": "1"
+      "completionDate": "01.05.2022",
+      "priority": "1",
+      "subtasks": []
     },
     {
       "id": "4",
+      "active": true,
+      "type": "task",
       "title": "Забронировать поезд домой",
       "description": "",
       "creationDate": "12.04.2022",
-      "completionDate": "21.04.2022",
-      "priority": "3"
+      "completionDate": "01.05.2022",
+      "priority": "3",
+      "subtasks": []
     },
     {
       "id": "5",
+      "active": true,
+      "type": "task",
       "title": "Выполнить задачу 404",
       "description": "На странице детализации по буфету нужна кнопка Отмены списаний. Кнопка нужна для ролей Админ КШП и Админ БРСК. Данную задачу необходимо сделать в наиболее срочном порядке",
       "creationDate": "12.04.2022",
-      "completionDate": "20.04.2022",
-      "priority": "5"
+      "completionDate": "05.05.2022",
+      "priority": "5",
+      "subtasks": []
     }
   ],
   "goals": [

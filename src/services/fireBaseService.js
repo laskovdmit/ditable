@@ -29,7 +29,7 @@ export default class FireBaseService {
             const currentRef = ref(db, url);
     
             onValue(currentRef, (snapshot) => {
-                const data = Object.values(snapshot.val());
+                const data = Object.values(snapshot.val() ? snapshot.val() : {});
                 func(data);
             });
         } catch (err) {
@@ -43,7 +43,7 @@ export default class FireBaseService {
         return await get(child(dbRef, url))
             .then((snapshot) => {
                 if (snapshot.exists()) {
-                    return Object.values(snapshot.val());
+                    return snapshot.val();
                 } else {
                     console.error(`Невозможно получить данные из: ${url}`);
                 }
