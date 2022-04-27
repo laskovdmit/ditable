@@ -36,8 +36,7 @@ const TaskRef = ({task, closeModal, showModal}) => {
                 reopen();
             }}>
             <PriorityItem priority={priority}/>
-            <span className="item__title">{title}:</span>
-            {description && description.length > 25 ? description.slice(0, 24) + '...' : description}
+            <span className="item__title">{title && title.length > 50 ? title.slice(0, 49) + '...' : title}:</span>
         </StyledTaskRef>
     );
 };

@@ -11,24 +11,49 @@ import TaskInfo from './showTasksComponents/taskInfo';
 import SubtasksInfo from './showTasksComponents/subtasksInfo';
 import AddSubtasksItem from './showTasksComponents/addSubtasksItem';
 import ParentTaskInfo from './showTasksComponents/parentTaskInfo';
+import { getColor } from '../../../services/ditableService';
+
+const StyledWrapper = styled.div`
+    display: ${props => props.display};
+    margin-bottom: 5px;
+`;
 
 const StyledBtn = styled.button`
     display: block;
-    width: 200px;
+    width: 150px;
     padding: 10px 20px;
-    background-color: #32CD32;
     border: none;
     border-radius: 7px;
-    color: #fff;
     
     cursor: pointer;
-    
+    font-weight: bold;
+`;
+
+const StyledCompleteBtn = styled(StyledBtn)`
+    background-color: ${props => props.color};
+    margin-right: 15px;
+    color: #fff;
+
     &:hover {
-        background-color: #77DD77;
+        background-color: ${props => props.hoverColor};
     }
     
     &:active {
-        background-color: #90EE90;
+        background-color: ${props => props.activeColor};
+    }
+`;
+
+const StyledDeleteBtn = styled(StyledBtn)`
+    background-color: #fff;
+    border: 2px solid #d6d6d6;
+    color: rgba(0, 0, 0, .88);
+
+    :hover {
+        background-color: #e6e6e6;
+    }
+
+    :active  {
+        background-color: #efefef;
     }
 `;
 
@@ -40,6 +65,7 @@ const ShowTaskModal = ({
     const isEmpty = Object.keys(task).length === 0;
     const {id, creationDate, completionDate} = task;
     const [display, setDisplay] = useState(false);
+    const color = getColor(task.priority);
     
     if (isEmpty) {
         return null;
@@ -144,7 +170,8 @@ const ShowTaskModal = ({
                     choosenDate={completionDate}
                     display={display}
                     postData={postSubtaskData}
-                    setDisplay={setDisplay}/>
+                    setDisplay={setDisplay}
+                    showStatusMessage={showStatusMessage}/>
             </> : null}
             {task.type === 'subtask' ? 
                 <ParentTaskInfo
@@ -153,14 +180,26 @@ const ShowTaskModal = ({
                     closeModal={closeModal}
                     showModal={showModalTask}/>
             : null}
-            <StyledBtn onClick={() => {
-                completeTask(task);
-                closeModal();
-            }}>Выполнить</StyledBtn>
-            <StyledBtn onClick={() => {
-                removeTask(task);
-                closeModal();
-            }}>Удалить</StyledBtn>
+            <StyledWrapper display={!display ? 'flex' : 'none'}>
+                <StyledCompleteBtn
+                    color={color.main}
+                    hoverColor={color.hover}
+                    activeColor={color.active}
+                    onClick={() => {
+                        completeTask(task);
+                        closeModal();}}>
+                    Выполнить
+                </StyledCompleteBtn>
+                <StyledDeleteBtn
+                    color={color.main}
+                    hoverColor={color.hover}
+                    activeColor={color.active}
+                    onClick={() => {
+                        removeTask(task);
+                        closeModal();}}>
+                    Удалить
+                </StyledDeleteBtn>
+            </StyledWrapper>
         </ModalWrap>
     );
 };

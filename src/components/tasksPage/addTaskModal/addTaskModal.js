@@ -21,7 +21,7 @@ const StyledForm = styled.form`
         margin-bottom: 15px;
         padding: 5px 10px;
 
-        border: 1px solid #000;
+        border: 1px solid #999;
         border-radius: 3px;
     }
 
@@ -31,7 +31,7 @@ const StyledForm = styled.form`
         padding: 10px;
         margin-bottom: 15px;
         
-        border: 1px solid #000;
+        border: 1px solid #999;
         border-radius: 3px;
         resize: none;
     }
@@ -43,7 +43,7 @@ const StyledForm = styled.form`
         margin-bottom: 15px;
         margin-right: 15px;
         
-        border: 1px solid #000;
+        border: 1px solid #999;
         border-radius: 3px;
     }
 
@@ -80,7 +80,7 @@ const StyledForm = styled.form`
 
     .task__select {
         width: 200px;
-        border: 1px solid #000;
+        border: 1px solid #999;
         border-radius: 3px;
         padding: 5px;
         padding-right: 30px;
@@ -151,8 +151,27 @@ const AddTaskModal = ({error, modalAddTaskState, showError, showLoading, hideLoa
 
     const onSubmitForm = (e) => {
         e.preventDefault();
-        showLoading();
 
+        if (title === "") {
+            showStatusMessage({
+                id: nextId('dfhf'),
+                title: "Ошибка",
+                description: "Название задачи не может быть пустым"
+            });
+            return;
+        }
+
+        if (date === "") {
+            showStatusMessage({
+                id: nextId('trhd'),
+                title: "Ошибка",
+                description: "Необходимо выбрать дату выполнения задачи"
+            });
+            return;
+        }
+
+        showLoading();
+        
         const today = new Date();
         const currentDate = `${getZero(today.getDate())}.${getZero(today.getMonth() + 1)}.${today.getFullYear()}`;
 
@@ -175,8 +194,8 @@ const AddTaskModal = ({error, modalAddTaskState, showError, showLoading, hideLoa
         setDescr('');
         setDate('');
         setPriority('1');
-        closeAddTaskModal();
         hideLoading();
+        closeAddTaskModal();
         showStatusMessage({
             id: nextId('ssad'),
             title: "Успех",
@@ -208,12 +227,12 @@ const AddTaskModal = ({error, modalAddTaskState, showError, showLoading, hideLoa
                             onClick={() => setPriorityDisplay(!priorityDisplay)}>
                             <PriorityItem priority={priority}/>
                             <p>{getTextPriority(priority)}</p>
+                            <SelectPriorityItem
+                                setPriority={setPriority}
+                                display={priorityDisplay}
+                                setDisplay={setPriorityDisplay}
+                                top={-1}/>
                         </div>
-                        <SelectPriorityItem
-                            setPriority={setPriority}
-                            display={priorityDisplay}
-                            setDisplay={setPriorityDisplay}
-                            top={-1}/>
                     </div>
                 </div>
                 <button className="task__btn" type="submit">Отправить</button>

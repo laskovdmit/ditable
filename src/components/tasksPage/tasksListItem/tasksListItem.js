@@ -3,135 +3,173 @@ import styled from 'styled-components';
 import { connect } from 'react-redux';
 import PriorityItem from "../../priorityItem";
 import { showModalTask } from "../../../actions";
-import { getColor } from '../../../services/ditableService';
 
-const StyledTasksListItem = styled.li`
-    width: 400px;
+const StyledListItem = styled.li`
+    width: 100%;
     padding: 20px;
-    margin-left: auto;
-    margin-right: auto;
-    margin-bottom: 20px;
-
-    background-color: #ffffff;
-    border: 1px solid #999;
-    border-radius: 10px;
-    box-shadow: 0 10px 10px #999;
+    border-bottom: 1px solid #aaa;
+    
+    display: flex;
+    align-items: center;
 
     cursor: pointer;
     position: relative;
 
     &:hover {
-        box-shadow: 0 10px 20px #555;
-        
-        .item__close {
-            display: block;
-            position: absolute;
-            top: 0px;
-            right: 5px;
+        background-color: #efefef;
 
+        .item__close, .item__completeBtn {
             cursor: pointer;
 
-            font-size: 30px;
-            line-height: 30px;
+            display: block;
+            position: absolute;
+            left: -30px;
+
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            border: none;
+        }
+
+        .item__close {
+            top: 29px;
+            background-color: #FF0000;
+
+            &:hover {
+                background-color: #FF6060;
+            }
+
+            &:active {
+                background-color: #FF7373;
+            }
+
+            & i {
+                font-size: 20px;
+                color: #fff;
+            }
         }
 
         .item__completeBtn {
-            display: block;
+            top: -1px;
+            background-color: #00CC00;
+
+            &:hover {
+                background-color: #45E645;
+            }
+
+            &:active {
+                background-color: #67E667;
+            }
+
+            & i {
+                font-size: 22px;
+                color: #fff;
+            }
         }
     }
 
-    &:active {
-        box-shadow: 0 10px 10px #999999;
+    .item__info {
+        padding-left: 15px;
     }
 
-    .item__wrap {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-    }
+    .item__label {
+        border: 1px solid #999;
+        border-radius: 5px;
+        background-color: inherit;
+        padding: 2px 5px;
+        margin-bottom: 5px;
 
-    .item__btns {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+        font-weight: 300;
+        font-size: 13px;
     }
 
     .item__title {
-        font-weight: bold;
-        margin-left: 15px;
+        font-size: 20px;
+        margin-bottom: 5px;
     }
 
     .item__descr {
+        font-size: 14px;
         font-weight: 300;
-        margin-bottom: 10px;
+        word-break: break-all;
     }
 
-    .item__completiondate {
-        padding: 5px 10px;
-        cursor: pointer;
-
-        color: #fff;
-        background-color: ${props => props.color};
-
-        border: none;
-        border-radius: 3px;
-    }
-
-    .item__completeBtn {
-        display: none;
-        padding: 5px 10px;
-        cursor: pointer;
-
-        color: #fff;
-        background-color: #32CD32;
-
-        border: none;
-        border-radius: 3px;
-
-        &:hover {
-            background-color: #77DD77;
-        }
-        
-        &:active {
-            background-color: #90EE90;
-        }
-    }
-
-    .item__close {
+    .item__close, .item__completeBtn {
         display: none;
     }
 `;
 
-const TasksListItem = ({task, showModalTask, completeTask, removeTask}) => {
-    const {title, description, completionDate, priority} = task;
-    const color = getColor(priority);
+const StyledTaskListItem = styled(StyledListItem)`
+    /* background-color: #efefef; */
+`;
+
+const StyledSubtaskListItem = styled(StyledListItem)`
+    /* background-color: #ccc; */
+    padding-left: 40px;
+    
+    .item__title {
+        font-size: 18px;
+        margin-bottom: 0;
+    }
+`;
+
+const Wrapper = ({type, children, ...props}) => {
+    if (type === 'task') {
+        return (
+            <StyledTaskListItem {...props}>
+                {children}
+            </StyledTaskListItem>
+        );
+    } else {
+        return (
+            <StyledSubtaskListItem {...props}>
+                {children}
+            </StyledSubtaskListItem>
+        );
+    }
+}
+
+const TasksListItem = ({task, showModalTask, completeTask, removeTask, type}) => {
+    const {title, description, priority} = task;
+    let shortTitle = title.length > 50 ? title.slice(0, 49) + '...' : title;
+    let shortDescr = "";
+
+    if (task.type === "task") {
+        shortDescr = description.length > 140 ? description.slice(0, 139) + '...' : description;
+    }
 
     const showModal = (e) => {
-        if (!e.target.classList.contains('item__close') &&
-            !e.target.classList.contains('item__completeBtn')) {
+        const classNames = ['item__close', 'item__completeBtn', 'fa-solid'];
+        if (!classNames.some((elem) => e.target.classList.contains(elem))) {
             showModalTask(task);
         }
     };
-
+    
     return (
-        <StyledTasksListItem color={color} onClick={showModal}>
-            <div className="item__wrap">
-                <PriorityItem
-                    priority={priority}
-                    color={color}/>
-                <p className="item__title">{title}</p>
+        <Wrapper type={type} onClick={showModal}>
+            <div>
+                <PriorityItem priority={priority}/>
             </div>
-            {description ?
-                <div className="item__descr">
-                    {description.length > 40 ? description.slice(0, 39) + '...' : description}
-                </div>
-            : null}
-            <div className="item__btns">
-                <button className="item__completiondate">{completionDate}</button>
-                <button className="item__completeBtn" onClick={() => completeTask(task)}>Выполнить</button>
+            <div className="item__info">
+                {task.type === "subtask" ?
+                    <button className="item__label">
+                        Подзадача
+                    </button>
+                : null}
+                <p className="item__title">{shortTitle}</p>
+                {shortDescr ?
+                    <div className="item__descr">
+                        {shortDescr}
+                    </div>
+                : null}
             </div>
-            <div className="item__close" onClick={() => removeTask(task)}>&times;</div>
-        </StyledTasksListItem>
+            <button title={task.type === "task" ? "Выполнить задачу" : "Выполнить подзадачу"} className="item__completeBtn" onClick={() => completeTask(task)}>
+                <i className="fa-solid fa-check"></i>
+            </button>
+            <button title={task.type === "task" ? "Удалить задачу" : "Удалить подзадачу"} className="item__close" onClick={() => removeTask(task)}>
+                <i className="fa-solid fa-trash-can"></i>
+            </button>
+        </Wrapper>
     );
 };
 

@@ -1,19 +1,21 @@
 import React from 'react';
 import styled from 'styled-components';
 import TaskRef from './taskRef';
-import { filterActiveSubtasks } from '../../../../services/ditableService';
+import { sortTasks } from '../../../../services/ditableService';
 
 const StyledWrapper = styled.div`
+    margin-bottom: 15px;
+
     .subtasks__info {
         font-size: 20px;
         font-weight: bold;
 
-        margin-bottom: 15px;
+        margin-bottom: 10px;
     }
 
     .subtasks__list {
         border: 1px solid #999;
-        border-radius: 7px;
+        border-radius: 5px;
         margin-bottom: 15px;
         pointer-events: none;
 
@@ -38,20 +40,12 @@ const StyledWrapper = styled.div`
 `;
 
 const SubtaskInfo = ({task, display, setDisplay, closeModal, showModal}) => {
-    const filteredTask = filterActiveSubtasks(task);
-    const {subtasks} = filteredTask;
-    let subtasksArray;
-
-    if (subtasks) {
-        if (subtasks.length > 0) {
-            subtasksArray = Object.keys(subtasks).map(key => subtasks[key]);
-        }
-    }
-
+    const subtasksArray = task.subtasks ? sortTasks(task.subtasks) : "";
+    
     return (
         <StyledWrapper>
             <p className="subtasks__info">Подзадачи:</p>
-            {subtasksArray &&
+            {(subtasksArray.length !== 0) &&
                 <ul className="subtasks__list">
                     {subtasksArray.map(subtask => {
                         return <TaskRef

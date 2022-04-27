@@ -5,6 +5,7 @@ import StatusMessage from './statusMessage';
 
 const StyledWrapper = styled.div`
     position: fixed;
+    z-index: 12;
     bottom: 10px;
     left: 10px;
 `;

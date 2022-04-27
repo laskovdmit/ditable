@@ -5,13 +5,16 @@ import SelectPriorityItem from '../../../priorityItem/selectPriorityItem';
 import { getColor, getCalendarDate } from '../../../../services/ditableService';
 
 const StyledForm = styled.form`
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+
     .form__header, .form__footer {
-        margin-bottom: 10px;
         display: flex;
         align-items: center;
     }
 
     .form__priority {
+        position: relative;
         cursor: pointer;
         width: 40px;
         height: 40px;
@@ -23,6 +26,10 @@ const StyledForm = styled.form`
         
         &:hover {
             background-color: #ededed;
+        }
+
+        &.open {
+            border-radius: 7px 7px 0 0;
         }
     }
 
@@ -84,6 +91,7 @@ const StyledForm = styled.form`
         padding: 5px 10px;
         
         color: #fff;
+        font-weight: bold;
         cursor: pointer;
 
         border: none;
@@ -92,34 +100,30 @@ const StyledForm = styled.form`
         &--cancel {
             width: 120px;
             margin-right: 20px;
-            border: 2px solid #DC143C;
+            border: 2px solid #d6d6d6;
             background-color: inherit;
 
-            color: #DC143C;
+            color: rgba(0, 0, 0, .88);
 
             :hover {
-                color: #fff;
-                border: none;
-                background-color: #ed3e61;
+                background-color: #e6e6e6;
             }
 
             :active  {
-                color: #fff;
-                border: none;
-                background-color: #f299ab;
+                background-color: #efefef;
             }
         }
         
         &--submit {
             width: 150px;
-            background-color: #DC143C;
+            background-color: #00CC00;
 
             :hover {
-                background-color: #ed3e61;
+                background-color: #45E645;
             }
 
             :active  {
-                background-color: #f299ab;
+                background-color: #67E667;
             }
         }
     }
@@ -177,7 +181,7 @@ const TaskInfo = ({task, postData, display}) => {
     };
 
     return (
-        <StyledForm color={color} btnDisplay={btnDisplay} onSubmit={(e) => postData(e, {
+        <StyledForm color={color.main} btnDisplay={btnDisplay} onSubmit={(e) => postData(e, {
             newTitle,
             newDescr,
             newDate,
@@ -185,16 +189,15 @@ const TaskInfo = ({task, postData, display}) => {
         })}>
             <div className="form__header">
                 <div>
-                    <div className="form__priority" onClick={() => setPriorityDisplay(!priorityDisplay)}>
-                        <PriorityItem
-                            priority={newPriority}
-                            color={color}/>
+                    <div className={priorityDisplay ? "form__priority open" : "form__priority"} onClick={() => setPriorityDisplay(!priorityDisplay)}>
+                        <PriorityItem priority={newPriority}/>
+                        <SelectPriorityItem
+                            setPriority={setPriority}
+                            display={priorityDisplay}
+                            setDisplay={setPriorityDisplay}
+                            top="-1"
+                            left="1"/>
                     </div>
-                    <SelectPriorityItem
-                        setPriority={setPriority}
-                        display={priorityDisplay}
-                        setDisplay={setPriorityDisplay}
-                        top={5}/>
                     </div>
                 <input className="form__title form__input" type="text" value={newTitle}
                     onChange={(e) => setTitle(e.target.value)}

@@ -29,8 +29,8 @@ const StyledModalWrap = styled.div`
     }
 
     .modal__content {
-        min-width: ${props => props.width || '800px'};
-        min-height: ${props => props.height || '400px'};
+        width: ${props => props.width || '800px'};
+        height: ${props => props.height || '400px'};
         background-color: #fff;
         border-radius: 15px;
 
@@ -38,6 +38,19 @@ const StyledModalWrap = styled.div`
         position: relative;
         display: flex;
         flex-direction: column;
+
+        pointer-events: auto;
+    }
+
+    .modal__btncontent {
+        width: 100%;
+        height: 400px;
+        background-color: #fff;
+
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
 
         pointer-events: auto;
     }
@@ -69,12 +82,28 @@ const getScrollWidth = () => {
     return scrollWidth;
 };
 
-const ModalWrap = ({display, closedFunc, children, width, height}) => {
+const ModalWrap = ({display, closedFunc, children, width, height, first = false}) => {
     
     if (display) {
         document.body.style.overflow = 'hidden';
         document.body.style.marginRight = getScrollWidth() + 'px';
     } 
+
+    if (first) {
+        return (
+            <StyledModalWrap
+                display={display ? 'block' : 'none'}
+                width={width}
+                height={height}
+                onClick={(e) => (e.target === e.currentTarget) && closedFunc()}>
+                <div className="modal__wrap">
+                    <div className="modal__btncontent">
+                        {children}
+                    </div>
+                </div>
+            </StyledModalWrap>
+        );
+    }
     
     return (
         <StyledModalWrap

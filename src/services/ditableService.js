@@ -3,15 +3,35 @@ const getZero = (num) => num < 10 ? `0${num}` : num;
 const getColor = (priority) => {
     switch (priority) {
         case '5':
-            return '#8B0000';
+            return {
+                main: '#8B0000',
+                hover: '#C53131',
+                active: '#C55959'
+            };
         case '4':
-            return '#DC143C';
+            return {
+                main: '#DC143C',
+                hover: '#EE4C6B',
+                active: '#EE778E'
+            };
         case '3':
-            return '#FF4500';
+            return {
+                main: '#FF4500',
+                hover: '#FF7340',
+                active: '#FF9973'
+            };
         case '2':
-            return '#FFA500';
+            return {
+                main: '#FFA500',
+                hover: '#FFBC40',
+                active: '#FFCE73'
+            };
         default:
-            return '#FA8072';
+            return {
+                main: '#FA8072',
+                hover: '#FD9F95',
+                active: '#FDB8B1'
+            };
     }
 };
 
@@ -51,11 +71,33 @@ const filterActiveSubtasks = (task) => {
     }
 };
 
+const sortTasks = (tasks) => {
+    let arr = tasks;
+
+    if (!Array.isArray(tasks)) {
+        arr = Object.keys(tasks).map(key => tasks[key]);
+    }
+    
+    arr = arr.filter(task => task.active === true);
+    arr.sort((a, b) => {
+        if (+a.priority < +b.priority) {
+            return 1;
+        }
+        if (+a.priority > +b.priority) {
+            return -1;
+        }
+        return 0;
+    });
+
+    return arr;
+}
+
 export {
     getZero,
     getColor,
     getCalendarDate,
     getTextPriority,
     getPostingDate,
-    filterActiveSubtasks
+    filterActiveSubtasks,
+    sortTasks
 }

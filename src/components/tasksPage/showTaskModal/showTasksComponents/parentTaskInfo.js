@@ -7,7 +7,7 @@ const StyledWrap = styled.div`
         font-size: 20px;
         font-weight: bold;
 
-        margin-bottom: 15px;
+        margin-bottom: 10px;
     }
 
     .parent__item {

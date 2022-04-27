@@ -1,35 +1,36 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import nextId from 'react-id-generator';
 import PriorityItem from '../../../priorityItem';
 import SelectPriorityItem from '../../../priorityItem/selectPriorityItem';
 import { getTextPriority, getCalendarDate } from '../../../../services/ditableService';
+import { showStatusMessage } from '../../../../actions/';
 
 const StyledForm = styled.form`
     display: flex;
     flex-direction: column;
     align-items: flex-start;
 
-    padding-top: 15px;
-    padding-bottom: 10px;
+    margin-bottom: 10px;
 
     .addsub__title {
-        width: 400px;
+        width: 100%;
         height: 40px;
-        margin-bottom: 15px;
+        margin-bottom: 10px;
         padding: 5px 10px;
 
-        border: 1px solid #000;
-        border-radius: 3px;
+        border: 1px solid #777;
+        border-radius: 5px;
     }
 
     .addsub__descr {
-        width: 400px;
+        width: 100%;
         height: 100px;
         padding: 10px;
-        margin-bottom: 15px;
+        margin-bottom: 10px;
         
-        border: 1px solid #000;
-        border-radius: 3px;
+        border: 1px solid #777;
+        border-radius: 5px;
         resize: none;
     }
     
@@ -37,11 +38,10 @@ const StyledForm = styled.form`
         width: 150px;
         height: 42px;
         padding: 5px 10px;
-        margin-bottom: 15px;
-        margin-right: 15px;
+        margin-right: 10px;
         
-        border: 1px solid #000;
-        border-radius: 3px;
+        border: 1px solid #777;
+        border-radius: 5px;
     }
 
     .addsub__btn {
@@ -52,21 +52,22 @@ const StyledForm = styled.form`
         color: #fff;
         cursor: pointer;
 
-        background-color: #DC143C;
+        background-color: #00CC00;
         border: none;
-        border-radius: 3px;
+        border-radius: 7px;
 
         :hover {
-            background-color: #ed3e61;
+            background-color: #45E645;
         }
 
         :active  {
-            background-color: #f299ab;
+            background-color: #67E667;
         }
     }
 
     .addsub__flex {
         display: flex;
+        margin-bottom: 10px;
     }
 
     .addsub__wrap {
@@ -78,8 +79,8 @@ const StyledForm = styled.form`
     .addsub__select {
         width: 200px;
         height: 42px;
-        border: 1px solid #000;
-        border-radius: 3px;
+        border: 1px solid #777;
+        border-radius: 5px;
         padding: 5px;
         padding-right: 30px;
 
@@ -115,6 +116,10 @@ const StyledForm = styled.form`
             transform: rotate(-45deg);
         }
 
+        &.open {
+            border-radius: 5px 5px 0 0;
+        }
+
         &.open::after {
             transform: rotate(135deg);
         }
@@ -125,7 +130,7 @@ const StyledForm = styled.form`
     }
 `;
 
-const AddSubtasksItem = ({display, postData, setDisplay, choosenDate}) => {
+const AddSubtasksItem = ({display, postData, setDisplay, showStatusMessage, choosenDate}) => {
     const [title, setTitle] = useState('');
     const [descr, setDescr] = useState('');
     const [date, setDate] = useState('');
@@ -142,20 +147,42 @@ const AddSubtasksItem = ({display, postData, setDisplay, choosenDate}) => {
         return null;
     }
 
-    return (
-        <StyledForm onSubmit={(e) => {
-            postData(e, {
-                title,
-                descr,
-                date,
-                priority
+    const onSubmitForm = (e) => {
+        e.preventDefault();
+
+        if (title === "") {
+            showStatusMessage({
+                id: nextId('dfhf'),
+                title: "Ошибка",
+                description: "Название подзадачи не может быть пустым"
             });
-            setDisplay(!display);
-        }}>
-            <input className="addsub__title" type="text" placeholder="Введите название задачи"
+            return;
+        }
+
+        if (date === "") {
+            showStatusMessage({
+                id: nextId('trhd'),
+                title: "Ошибка",
+                description: "Необходимо выбрать дату выполнения подзадачи"
+            });
+            return;
+        }
+
+        postData(e, {
+            title,
+            descr,
+            date,
+            priority
+        });
+        setDisplay(!display);
+    };
+
+    return (
+        <StyledForm onSubmit={onSubmitForm}>
+            <input className="addsub__title" type="text" placeholder="Введите название подзадачи"
                 value={title}
                 onInput={(e) => setTitle(e.target.value)}/>
-            <textarea className="addsub__descr" type="text" placeholder="Введите описание задачи"
+            <textarea className="addsub__descr" type="text" placeholder="Введите описание подзадачи"
                 value={descr}
                 onInput={(e) => setDescr(e.target.value)}></textarea>
             <div className="addsub__flex">
@@ -166,12 +193,11 @@ const AddSubtasksItem = ({display, postData, setDisplay, choosenDate}) => {
                     onClick={() => setPriorityDisplay(!priorityDisplay)}>
                     <PriorityItem priority={priority}/>
                     <p>{getTextPriority(priority)}</p>
+                    <SelectPriorityItem
+                        setPriority={setPriority}
+                        display={priorityDisplay}
+                        setDisplay={setPriorityDisplay}/>
                 </div>
-                <SelectPriorityItem
-                    setPriority={setPriority}
-                    display={priorityDisplay}
-                    setDisplay={setPriorityDisplay}
-                    top={-1}/>
             </div>
             <button className="addsub__btn" type="submit">Добавить</button>
         </StyledForm>

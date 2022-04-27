@@ -4,7 +4,9 @@ import PriorityItem from './priorityItem';
 import { getTextPriority } from '../../services/ditableService';
 
 const StyledPriority = styled.div`
-    position: relative;
+    position: absolute;
+    bottom: -1px;
+    left: -1px;
     z-index: 11;
     
     .select__head, .select__item {
@@ -20,18 +22,19 @@ const StyledPriority = styled.div`
     .select__list {
         display: ${props => props.display};
         position: absolute;
+        margin-left: ${props => props.left + 'px'};
         margin-top: ${props => props.top + 'px'};
         
         width: 200px;
         box-sizing: border-box;
 
         background-color: #fff;
-        border: 1px solid #000;
-        border-radius: 3px;
+        border: 1px solid #999;
+        border-radius: 0 0 5px 5px;
     }
 
     .select__item {
-        border-bottom: 1px solid #000;
+        border-bottom: 1px solid #999;
         cursor: pointer;
 
         &:hover {
@@ -44,7 +47,7 @@ const StyledPriority = styled.div`
     }
 `;
 
-const SelectPriorityItem = ({setPriority, display, setDisplay, top = 0}) => {
+const SelectPriorityItem = ({setPriority, display, setDisplay, top = 0, left = 0}) => {
 
     const changePriority = (priority) => {
         setPriority(priority);
@@ -52,7 +55,7 @@ const SelectPriorityItem = ({setPriority, display, setDisplay, top = 0}) => {
     };
     
     return (
-        <StyledPriority display={display ? 'block' : 'none'} top={top}>
+        <StyledPriority display={display ? 'block' : 'none'} top={top} left={left}>
             <ul className="select__list">
                 {['5', '4', '3', '2', '1'].map(item => {
                     return (

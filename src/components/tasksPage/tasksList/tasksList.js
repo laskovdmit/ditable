@@ -3,9 +3,10 @@ import styled from 'styled-components';
 import TasksListItem from "../tasksListItem/";
 import { getZero, filterActiveSubtasks } from "../../../services/ditableService";
 import AddTask from "../addTask";
+import { sortTasks } from "../../../services/ditableService";
 
 const StyledUl = styled.ul`
-    width: 600px;
+    width: 700px;
     margin: 0 auto;
     padding: 0;
     padding-top: 20px;
@@ -14,9 +15,13 @@ const StyledUl = styled.ul`
     display: flex;
     flex-direction: column;
     
-    border-left: 1px solid #999;
+    /* border-left: 1px solid #999; */
 
-    &::before {
+    .tasks__addItem {
+        display: none;
+    }
+
+    /* &::before {
         content: "";
 
         position: absolute;
@@ -27,34 +32,68 @@ const StyledUl = styled.ul`
         height: 10px;
         border-radius: 50%;
         background-color: #999;
+    } */
+
+    .tasks__date {
+        position: relative;
+        cursor: pointer;
+
+        display: flex;
+        align-items: center;
+
+        min-height: 31px;
+        padding: 5px 20px;
+        
+        font-weight: 300;
+
+        &:hover .tasks__addItem {
+            display: block;
+        }
+
+        /* &::before {
+            content: "";
+
+            position: absolute;
+            top: 50%;
+            left: 0;
+
+            width: 15px;
+            height: 1px;
+            background-color: #999;
+        } */
     }
 
     .tasks__item {
-        display: flex;
-        flex-direction: column;
-
-        margin-bottom: 5px;
+        margin-bottom: 10px;
 
         &--indicated {
-            padding: 10px 0;
+            margin-bottom: 50px;
 
             .tasks__date {
-                font-size: 20px;
-                font-weight: bold;
-                text-align: center;
-
-                position: relative;
-                border-bottom: none;
                 padding: 10px 20px;
+                justify-content: center;
+                border-bottom: 1px solid #aaa;
 
-                &::before {
+                cursor: default;
+
+                & p {
+                    font-size: 20px;
+                    font-weight: bold;
+                    text-align: center;
+
+                    background-color: #fff;
+                    padding: 0 30px;
+                    z-index: 2;
+                }
+
+                /* &::before {
                     content: "";
 
                     position: absolute;
                     top: 50%;
                     left: 0;
 
-                    width: 230px;
+                    width: 100%;
                     height: 1px;
                     background-color: #999;
                 }
@@ -71,15 +110,9 @@ const StyledUl = styled.ul`
                     height: 10px;
                     border-radius: 50%;
                     background-color: #999;
-                }
+                } */
             }
         }
-    }
-
-    .tasks__date {
-        font-weight: 300;
-        padding: 5px 20px;
-        position: relative;
     }
 `;
 
@@ -96,15 +129,14 @@ const getDateArray = (date, daysCount) => {
     return dateArr;
 };
 
-const TasksList = ({tasks, display, openFunc, closedFunc, setDate, period, completeTask, removeTask}) => {
+const TasksList = ({tasks, openFunc, setDate, period, completeTask, removeTask}) => {
     const today = Date.parse(new Date());
     const dateArray = getDateArray(today, period);
     const tasksDateArray = [];
+    const tasksArr = sortTasks(tasks);
 
-    tasks.forEach(task => {
-        if (task.active) {
-            tasksDateArray.push(task.completionDate);
-        }
+    tasksArr.forEach(task => {
+        tasksDateArray.push(task.completionDate);
         
         if (task.subtasks) {
             const filteredTask = filterActiveSubtasks(task);
@@ -121,41 +153,46 @@ const TasksList = ({tasks, display, openFunc, closedFunc, setDate, period, compl
                 dateArray.map(date => {
                     const matchesDate = tasksDateArray.filter(taskDate => taskDate === date);
                     const isDateMatch = matchesDate.length !== 0 ? true : false;
+                    let subtaskArray = [];
 
                     if (isDateMatch) {
                         return (
                             <div className="tasks__item tasks__item--indicated" key={date}>
-                                <div className="tasks__date">{date}</div>
-                                {tasks.map(task => {
-                                    if (task.active === true && task.completionDate === date) {
-                                        return <TasksListItem key={task.id}
+                                <div className="tasks__date"><p>{date}</p></div>
+                                {tasksArr.map(task => {
+                                    for (let key in task.subtasks) {
+                                        subtaskArray.push(task.subtasks[key]); 
+                                    }
+
+                                    if (task.completionDate === date) {
+
+                                        return <TasksListItem
+                                                    key={task.id}
                                                     task={task}
                                                     completeTask={completeTask}
-                                                    removeTask={removeTask}/>
+                                                    removeTask={removeTask}
+                                                    type={'task'}/>
                                     } else {
                                         return null;
                                     }
                                 })}
-                                {tasks.map(task => {
-                                    if (!!task.subtasks) {
-                                        const filteredTask = filterActiveSubtasks(task);
-                                        const subtaskArray = Object.keys(filteredTask.subtasks).map(key => filteredTask.subtasks[key]);
-
-                                        return subtaskArray.map(subtask => {
-                                            if (subtask.completionDate === date) {
-                                                return <TasksListItem key={subtask.id}
-                                                            task={subtask}
-                                                            completeTask={completeTask}
-                                                            removeTask={removeTask}/>
-                                            } else {
-                                                return null;
-                                            }
-                                        })
-                                    } else {
-                                        return null;
-                                    }
-                                })}
-                                <AddTask display={display} openFunc={openFunc} closedFunc={closedFunc} setDate={setDate} date={date}/>
+                                {sortTasks(subtaskArray).map(subtask => {
+                                        if (subtask.completionDate === date) {
+                                            return <TasksListItem
+                                                        key={subtask.id}
+                                                        task={subtask}
+                                                        completeTask={completeTask}
+                                                        removeTask={removeTask}
+                                                        type={'subtask'}/>
+                                        } else {
+                                            return null;
+                                        }
+                                    })
+                                }
+                                <AddTask
+                                    openFunc={openFunc}
+                                    setDate={setDate}
+                                    date={date}/>
                             </div>
                         )
                     } else {
@@ -163,7 +200,11 @@ const TasksList = ({tasks, display, openFunc, closedFunc, setDate, period, compl
                             <div className="tasks__item" key={date}>
                                 <div className="tasks__date">
                                     {date}
-                                    <AddTask display={display} openFunc={openFunc} closedFunc={closedFunc} setDate={setDate} date={date} outline/>
+                                    <AddTask
+                                        openFunc={openFunc}
+                                        setDate={setDate}
+                                        date={date}
+                                        type={"outline"}/>
                                 </div>
                             </div>
                         )

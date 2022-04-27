@@ -1,28 +1,26 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 
 
 const StyledBtn = styled.button`
-    width: 200px;
-    height: 40px;
-    padding: 10px;
-
     display: block;
+    padding: 10px;
     margin: 0 auto;
-
+    margin-top: 15px;
     cursor: pointer;
 
-    background-color: #fff;
+    font-weight: 300;
     border: 1px solid #999;
-    border-radius: 20px;
-    box-shadow: 0 3px 5px 0 #999;
+    border-radius: 7px;
+    box-shadow: 1px 3px 5px 0 #ddd;
+    background-color: #fff;
 
     :hover {
-        box-shadow: 0 5px 5px 0 #777;
+        box-shadow: 1px 3px 5px 0 #aaa;
     }
 
     :active {
-        box-shadow: 0 5px 5px 0 #999;
+        box-shadow: 1px 3px 5px 0 #eee;
     }
 `;
 
@@ -44,13 +42,30 @@ const StyledOutlineBtn = styled.button`
     }
 `;
 
-const AddTask = ({openFunc, setDate, date = 0, outline}) => {
+const StyledFirstBtn = styled(StyledBtn)`
+    padding: 15px 20px;
+    font-size: 20px;
+    font-weight: 500;
+    box-shadow: none;
 
-    if (outline) {
+    :hover {
+        box-shadow: none;
+        background-color: #efefef;
+    }
+
+    :active {
+        box-shadow: none;
+        background-color: #fff;
+    }
+`;
+
+const AddTask = ({openFunc, setDate, date = 0, type}) => {
+
+    if (type === 'outline') {
         return (
             <StyledOutlineBtn
+                className="tasks__addItem"
                 type="button"
-                outline={outline}
                 onClick={() => {
                     openFunc();
                     setDate(date);
@@ -58,11 +73,23 @@ const AddTask = ({openFunc, setDate, date = 0, outline}) => {
                 + Добавить задачу
             </StyledOutlineBtn>
         )
+    } else if (type === "first") {
+        return (
+            <StyledFirstBtn
+                className="tasks__addItem"
+                type="button"
+                onClick={() => {
+                    openFunc();
+                    setDate(date);
+                }}>
+                + Добавить первую задачу
+            </StyledFirstBtn>
+        );
     } else {
         return (
             <StyledBtn
+                className="addItem"
                 type="button"
-                outline={outline}
                 onClick={() => {
                     openFunc();
                     setDate(date);

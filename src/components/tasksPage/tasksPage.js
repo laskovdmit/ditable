@@ -11,6 +11,7 @@ import AddTaskModal from './addTaskModal';
 import ShowTaskModal from "./showTaskModal/showTaskModal";
 import nextId from 'react-id-generator';
 import { filterActiveSubtasks } from '../../services/ditableService';
+import ModalWrap from "../modalWrap";
 
 const StyledTasksPage = styled.div`
     flex-grow: 1;
@@ -27,6 +28,23 @@ const StyledTasksPage = styled.div`
         &-input {
             width: 60px;
             margin: 0 5px;
+        }
+    }
+
+    .tasks__greetings {
+        font-size: 20px;
+
+        width: 300px;
+        margin: 0 auto;
+        text-align: center;
+        
+        & p {
+            margin-bottom: 10px;
+
+            &:first-of-type {
+                font-size: 30px;
+                font-weight: bold;
+            }
         }
     }
 `;
@@ -143,6 +161,7 @@ const TasksPageRender = ({
     
     const [date, setDate] = useState('');
     const [period, setPeriod] = useState(30);
+    const [display, setDisplay] = useState(true);
 
     const onChangePeriod = (e) => {
         const value = e.target.value;
@@ -163,6 +182,25 @@ const TasksPageRender = ({
 
     return (
         <StyledTasksPage>
+            {tasks.length === 0 &&
+                <ModalWrap closedFunc={() => {
+                        document.body.style = '';
+                        return setDisplay();
+                        }}
+                    display={display}
+                    first>
+                    <div className="tasks__greetings">
+                        <p>Привет!</p>
+                        <p>Вижу, что у тебя не добавлено еще ни одной задачи 😒</p>
+                        <p>Давай я помогу тебе создать новую!</p>
+                    </div>
+                    <AddTask openFunc={() => {
+                            setDisplay(false);
+                            showAddTaskModal();
+                        }}
+                        setDate={setDate}
+                        type={"first"}/>
+                </ModalWrap>}
             <AddTaskModal
                 choosenDate={date}/>
             <ShowTaskModal
@@ -180,16 +218,9 @@ const TasksPageRender = ({
                     дней вперед
                 </label>
             </div>
-            <AddTask
-                display={modalAddTaskState}
-                openFunc={showAddTaskModal}
-                closedFunc={closeAddTaskModal}
-                setDate={setDate}/>
             <TasksList
                 tasks={tasks}
-                display={modalAddTaskState}
                 openFunc={showAddTaskModal}
-                closedFunc={closeAddTaskModal}
                 setDate={setDate}
                 period={period}
                 completeTask={completeTask}
