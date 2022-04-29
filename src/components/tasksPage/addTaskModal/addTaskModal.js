@@ -194,6 +194,7 @@ const AddTaskModal = ({error, modalAddTaskState, showError, showLoading, hideLoa
         setDescr('');
         setDate('');
         setPriority('1');
+
         hideLoading();
         closeAddTaskModal();
         showStatusMessage({

@@ -172,7 +172,7 @@ const TaskInfo = ({task, postData, display}) => {
         }
 
     }, [display, title, newTitle, description, newDescr, completionDate, newDate, newPriority, priority]);
-    
+
     const resetData = () => {
         setTitle(title);
         setDescr(description);

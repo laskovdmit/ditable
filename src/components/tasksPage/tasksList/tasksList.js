@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import TasksListItem from "../tasksListItem/";
 import { getZero, filterActiveSubtasks } from "../../../services/ditableService";
 import AddTask from "../addTask";
-import { sortTasks } from "../../../services/ditableService";
+import { sortTasks, getTextDay } from "../../../services/ditableService";
 
 const StyledUl = styled.ul`
     width: 700px;
@@ -14,25 +14,22 @@ const StyledUl = styled.ul`
     position: relative;
     display: flex;
     flex-direction: column;
-    
-    /* border-left: 1px solid #999; */
 
     .tasks__addItem {
         display: none;
     }
 
-    /* &::before {
-        content: "";
+    .tasks__month {
+        font-size: 30px;
+        font-weight: bold;
+        /* text-align: center; */
+        padding: 10px;
+        padding-left: 20px;
+        margin-bottom: 10px;
 
-        position: absolute;
-        top: -5px;
-        left: -5px;
-
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background-color: #999;
-    } */
+        /* border-bottom: 1px solid #999; */
+        /* box-shadow: 5px 5px 5px 0 #999; */
+    }
 
     .tasks__date {
         position: relative;
@@ -49,18 +46,6 @@ const StyledUl = styled.ul`
         &:hover .tasks__addItem {
             display: block;
         }
-
-        /* &::before {
-            content: "";
-
-            position: absolute;
-            top: 50%;
-            left: 0;
-
-            width: 15px;
-            height: 1px;
-            background-color: #999;
-        } */
     }
 
     .tasks__item {
@@ -71,46 +56,22 @@ const StyledUl = styled.ul`
 
             .tasks__date {
                 padding: 10px 20px;
-                justify-content: center;
                 border-bottom: 1px solid #aaa;
 
                 cursor: default;
 
+                &:hover .tasks__addItem {
+                    color: #333;
+                }
+
                 & p {
-                    font-size: 20px;
+                    font-size: 24px;
                     font-weight: bold;
                     text-align: center;
 
                     background-color: #fff;
-                    padding: 0 30px;
                     z-index: 2;
                 }
-
-                /* &::before {
-                    content: "";
-
-                    position: absolute;
-                    top: 50%;
-                    left: 0;
-
-                    width: 100%;
-                    height: 1px;
-                    background-color: #999;
-                }
-
-                &::after {
-                    content: "";
-
-                    position: absolute;
-                    top: 50%;
-                    left: -5px;
-                    transform: translate(0, -50%);
-
-                    width: 10px;
-                    height: 10px;
-                    border-radius: 50%;
-                    background-color: #999;
-                } */
             }
         }
     }
@@ -122,15 +83,14 @@ const getDateArray = (date, daysCount) => {
 
     for (let i = 0; i < daysCount; i++) {
         const newDate = new Date(date + oneDay * i);
-        const newDateStrng = `${getZero(newDate.getDate())}.${getZero(newDate.getMonth() + 1)}.${newDate.getFullYear()}`;
-        dateArr.push(newDateStrng);
+        const newDateString = `${getZero(newDate.getDate())}.${getZero(newDate.getMonth() + 1)}.${newDate.getFullYear()}`;
+        dateArr.push({ date: newDateString, parsedDate: newDate});
     }
 
     return dateArr;
 };
 
-const TasksList = ({tasks, openFunc, setDate, period, completeTask, removeTask}) => {
-    const today = Date.parse(new Date());
+const TasksList = ({tasks, openFunc, setDate, period, completeTask, removeTask, today}) => {
     const dateArray = getDateArray(today, period);
     const tasksDateArray = [];
     const tasksArr = sortTasks(tasks);
@@ -150,63 +110,81 @@ const TasksList = ({tasks, openFunc, setDate, period, completeTask, removeTask})
     return (
         <StyledUl>
             {
-                dateArray.map(date => {
-                    const matchesDate = tasksDateArray.filter(taskDate => taskDate === date);
+                dateArray.map(obj => {
+                    const matchesDate = tasksDateArray.filter(taskDate => taskDate === obj.date);
                     const isDateMatch = matchesDate.length !== 0 ? true : false;
+                    const dayWeek = getTextDay(obj.parsedDate);
                     let subtaskArray = [];
+                    let currentMonth = (
+                        <div className="tasks__month" data-month={obj.parsedDate.getMonth()}>
+                            {obj.parsedDate.toLocaleString('default', { month: 'long' }).toUpperCase()}
+                        </div>
+                    );
+                    
+                    const isNextMonth = obj.parsedDate.getDate() === 1;
+
 
                     if (isDateMatch) {
                         return (
-                            <div className="tasks__item tasks__item--indicated" key={date}>
-                                <div className="tasks__date"><p>{date}</p></div>
-                                {tasksArr.map(task => {
-                                    for (let key in task.subtasks) {
-                                        subtaskArray.push(task.subtasks[key]); 
-                                    }
+                            <React.Fragment key={obj.date}>
+                                {isNextMonth && currentMonth}
+                                <div className="tasks__item tasks__item--indicated">
+                                    <div className="tasks__date">
+                                        <p>{obj.date} • {dayWeek}</p>
+                                        <AddTask
+                                            openFunc={openFunc}
+                                            setDate={setDate}
+                                            date={obj.date}
+                                            type={"outline"}/>
+                                    </div>
+                                    {tasksArr.map(task => {
+                                        for (let key in task.subtasks) {
+                                            subtaskArray.push(task.subtasks[key]); 
+                                        }
 
-                                    if (task.completionDate === date) {
+                                        if (task.completionDate === obj.date) {
 
-                                        return <TasksListItem
-                                                    key={task.id}
-                                                    task={task}
-                                                    completeTask={completeTask}
-                                                    removeTask={removeTask}
-                                                    type={'task'}/>
-                                    } else {
-                                        return null;
-                                    }
-                                })}
-                                {sortTasks(subtaskArray).map(subtask => {
-                                        if (subtask.completionDate === date) {
                                             return <TasksListItem
-                                                        key={subtask.id}
-                                                        task={subtask}
+                                                        key={task.id}
+                                                        task={task}
                                                         completeTask={completeTask}
                                                         removeTask={removeTask}
-                                                        type={'subtask'}/>
+                                                        type={'task'}/>
                                         } else {
                                             return null;
                                         }
-                                    })
-                                }
-                                <AddTask
-                                    openFunc={openFunc}
-                                    setDate={setDate}
-                                    date={date}/>
-                            </div>
+                                    })}
+                                    {sortTasks(subtaskArray).map(subtask => {
+                                            if (subtask.completionDate === obj.date) {
+                                                return <TasksListItem
+                                                            key={subtask.id}
+                                                            task={subtask}
+                                                            completeTask={completeTask}
+                                                            removeTask={removeTask}
+                                                            type={'subtask'}/>
+                                            } else {
+                                                return null;
+                                            }
+                                        })
+                                    }
+                                </div>
+                            </React.Fragment>
                         )
                     } else {
                         return (
-                            <div className="tasks__item" key={date}>
-                                <div className="tasks__date">
-                                    {date}
-                                    <AddTask
-                                        openFunc={openFunc}
-                                        setDate={setDate}
-                                        date={date}
-                                        type={"outline"}/>
+                            <React.Fragment key={obj.date}>
+                                {isNextMonth && currentMonth}
+                                <div className="tasks__item">
+                                    <div className="tasks__date">
+                                        {obj.date} • {dayWeek}
+                                        <AddTask
+                                            openFunc={openFunc}
+                                            setDate={setDate}
+                                            date={obj.date}
+                                            type={"outline"}/>
+                                    </div>
                                 </div>
-                            </div>
+                            </React.Fragment>
                         )
                     }
                 })

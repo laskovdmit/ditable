@@ -5,10 +5,9 @@ import styled from 'styled-components';
 const StyledBtn = styled.button`
     display: block;
     padding: 10px;
-    margin: 0 auto;
-    margin-top: 15px;
     cursor: pointer;
 
+    font-size: 20px;
     font-weight: 300;
     border: 1px solid #999;
     border-radius: 7px;
@@ -59,7 +58,7 @@ const StyledFirstBtn = styled(StyledBtn)`
     }
 `;
 
-const AddTask = ({openFunc, setDate, date = 0, type}) => {
+const AddTask = ({openFunc, setDate = () => {}, date = 0, type}) => {
 
     if (type === 'outline') {
         return (

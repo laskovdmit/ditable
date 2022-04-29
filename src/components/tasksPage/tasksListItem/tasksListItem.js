@@ -7,6 +7,8 @@ import { showModalTask } from "../../../actions";
 const StyledListItem = styled.li`
     width: 100%;
     padding: 20px;
+    padding-left: 30px;
+    padding-right: 110px;
     border-bottom: 1px solid #aaa;
     
     display: flex;
@@ -23,7 +25,9 @@ const StyledListItem = styled.li`
 
             display: block;
             position: absolute;
-            left: -30px;
+            top: 50%;
+            transform: translate(0, -50%);
+            font-size: 22px;
 
             width: 30px;
             height: 30px;
@@ -32,38 +36,32 @@ const StyledListItem = styled.li`
         }
 
         .item__close {
-            top: 29px;
-            background-color: #FF0000;
+            right: 15px;
+            color: #555;
 
-            &:hover {
-                background-color: #FF6060;
+            &:hover i{
+                color: #999;
             }
 
-            &:active {
-                background-color: #FF7373;
-            }
-
-            & i {
-                font-size: 20px;
-                color: #fff;
+            &:active i{
+                color: #bbb;
             }
         }
 
         .item__completeBtn {
-            top: -1px;
-            background-color: #00CC00;
+            font-size: 30px;
+            font-weight: bold;
+
+            border-radius: 50%;
+            right: 60px;
+            color: #00CC00;
 
             &:hover {
-                background-color: #45E645;
+                color: #45E645;
             }
 
             &:active {
-                background-color: #67E667;
-            }
-
-            & i {
-                font-size: 22px;
-                color: #fff;
+                color: #67E667;
             }
         }
     }
@@ -73,6 +71,7 @@ const StyledListItem = styled.li`
     }
 
     .item__label {
+        display: inline-block;
         border: 1px solid #999;
         border-radius: 5px;
         background-color: inherit;
@@ -100,13 +99,11 @@ const StyledListItem = styled.li`
 `;
 
 const StyledTaskListItem = styled(StyledListItem)`
-    /* background-color: #efefef; */
 `;
 
 const StyledSubtaskListItem = styled(StyledListItem)`
-    /* background-color: #ccc; */
-    padding-left: 40px;
-    
+    padding-left: 50px;
+
     .item__title {
         font-size: 18px;
         margin-bottom: 0;
@@ -131,11 +128,11 @@ const Wrapper = ({type, children, ...props}) => {
 
 const TasksListItem = ({task, showModalTask, completeTask, removeTask, type}) => {
     const {title, description, priority} = task;
-    let shortTitle = title.length > 50 ? title.slice(0, 49) + '...' : title;
+    let shortTitle = title.length > 40 ? title.slice(0, 39) + '...' : title;
     let shortDescr = "";
 
     if (task.type === "task") {
-        shortDescr = description.length > 140 ? description.slice(0, 139) + '...' : description;
+        shortDescr = description.length > 130 ? description.slice(0, 129) + '...' : description;
     }
 
     const showModal = (e) => {
@@ -152,9 +149,9 @@ const TasksListItem = ({task, showModalTask, completeTask, removeTask, type}) =>
             </div>
             <div className="item__info">
                 {task.type === "subtask" ?
-                    <button className="item__label">
+                    <span className="item__label">
                         Подзадача
-                    </button>
+                    </span>
                 : null}
                 <p className="item__title">{shortTitle}</p>
                 {shortDescr ?

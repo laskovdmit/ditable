@@ -43,6 +43,46 @@ const getPostingDate = (date) => {
     return `${getZero(date.getDate())}.${getZero(date.getMonth() + 1)}.${date.getFullYear()}`;
 };
 
+const getTextDay = (parseDate) => {
+    const today = new Date();
+    const dayWeek = new Date(parseDate);
+
+    if (today.getMonth() === dayWeek.getMonth() &&
+        today.getFullYear() === dayWeek.getFullYear()) {
+
+        if (today.getDate() === dayWeek.getDate()) {
+            return 'Сегодня';
+        }
+
+        if (today.getDate() + 1 === dayWeek.getDate()) {
+            return 'Завтра';
+        }
+
+        if (today.getDate() - 1 === dayWeek.getDate()) {
+            return 'Вчера';
+        }
+    }
+
+    switch (dayWeek.getDay()) {
+        case 0: 
+            return "Воскресенье";
+        case 1: 
+            return "Понедельник";
+        case 2: 
+            return "Вторник";
+        case 3: 
+            return "Среда";
+        case 4: 
+            return "Четверг";
+        case 5: 
+            return "Пятница";
+        case 6: 
+            return "Суббота";
+        default:
+            return; 
+    }
+}
+
 const getTextPriority = (priority) => {
     switch (priority) {
         case '5':
@@ -92,6 +132,21 @@ const sortTasks = (tasks) => {
     return arr;
 }
 
+const getScrollWidth = () => {
+    const div = document.createElement('div');
+
+    div.style.width = '50px';
+    div.style.height = '50px';
+    div.style.overflowY ='scroll';
+    div.style.visibility = 'hidden';
+
+    document.body.appendChild(div);
+    let scrollWidth = div.offsetWidth - div.clientWidth;
+    div.remove();
+
+    return scrollWidth;
+};
+
 export {
     getZero,
     getColor,
@@ -99,5 +154,7 @@ export {
     getTextPriority,
     getPostingDate,
     filterActiveSubtasks,
-    sortTasks
+    sortTasks,
+    getTextDay,
+    getScrollWidth
 }

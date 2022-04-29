@@ -49,13 +49,52 @@ const StyledTasksPage = styled.div`
     }
 `;
 
-const TasksPage = ({tasksLoaded, showLoading, showError, hideLoading, showStatusMessage, ...props}) => {
+const TasksPage = ({tasksLoaded, showLoading, showError, hideLoading, showStatusMessage, modalTaskState, modalAddTaskState, setMonth, ...props}) => {
     const firebaseService = useContext(FirebaseServiceContext);
+    const [period, setPeriod] = useState(30);
+    const [today, setToday] = useState(Date.parse(new Date()));
+
 
     useEffect(() => {
         showLoading();
         firebaseService.listenChangingData('tasks/', (newData) => tasksLoaded(newData), showError);
     }, []);
+
+    useEffect(() => {
+        const onWheelFunc = () => {
+            let windowTop = document.documentElement.getBoundingClientRect().top;
+            
+            if (windowTop > -10 && !(modalTaskState || modalAddTaskState)) {
+                setPeriod(period + 1);
+                setToday(today - 86400000);
+            }
+        };
+        
+        const onScrollFunc = () => {
+
+            let windowBottom = document.documentElement.getBoundingClientRect().bottom;
+
+            if (windowBottom < document.documentElement.clientHeight + 100) {
+                setPeriod(period + 1);
+            }
+        };
+
+        const onKeyDownFunc = (e) => {
+            if (e.code === 'ArrowUp') {
+                onWheelFunc();
+            }
+        };
+        
+        window.addEventListener('scroll', onScrollFunc);
+        window.addEventListener('wheel', onWheelFunc);
+        document.addEventListener('keydown', onKeyDownFunc);
+
+        return () => {
+            window.removeEventListener('scroll', onScrollFunc);
+            window.removeEventListener('wheel', onWheelFunc);
+            document.removeEventListener('keydown', onKeyDownFunc);
+        }
+    });
 
     const completeTask = (task) => {
         showLoading();
@@ -150,27 +189,19 @@ const TasksPage = ({tasksLoaded, showLoading, showError, hideLoading, showStatus
         <TasksPageRender
             {...props}
             completeTask={completeTask}
-            removeTask={removeTask}/>
+            removeTask={removeTask}
+            period={period}
+            today={today}/>
     );
 };
 
 const TasksPageRender = ({
     tasks, selectedTask, modalAddTaskState, loading, error,
-    showAddTaskModal, closeAddTaskModal, completeTask, removeTask
+    showAddTaskModal, closeAddTaskModal, completeTask, removeTask, period, today
     }) => {
     
     const [date, setDate] = useState('');
-    const [period, setPeriod] = useState(30);
     const [display, setDisplay] = useState(true);
-
-    const onChangePeriod = (e) => {
-        const value = e.target.value;
-
-        value > 180 ? setPeriod(180) :
-        value < 0 ? setPeriod(1) : 
-        value === "" ? setPeriod(value) :
-        setPeriod(Math.floor(value))
-    };
 
     if (error) {
         return <Error/>
@@ -181,7 +212,7 @@ const TasksPageRender = ({
     }
 
     return (
-        <StyledTasksPage>
+        <StyledTasksPage className="app__tasks">
             {tasks.length === 0 &&
                 <ModalWrap closedFunc={() => {
                         document.body.style = '';
@@ -198,7 +229,6 @@ const TasksPageRender = ({
                             setDisplay(false);
                             showAddTaskModal();
                         }}
-                        setDate={setDate}
                         type={"first"}/>
                 </ModalWrap>}
             <AddTaskModal
@@ -209,22 +239,14 @@ const TasksPageRender = ({
                 height="auto"
                 completeTask={completeTask}
                 removeTask={removeTask}/>
-            <div className="tasks__period">
-                <label className="tasks__period-label" htmlFor="tasks__period">
-                    Показать задачи на
-                        <input className="tasks__period-input" id="tasks__period" type="number"
-                        value={period}
-                        onChange={onChangePeriod} />
-                    дней вперед
-                </label>
-            </div>
             <TasksList
                 tasks={tasks}
                 openFunc={showAddTaskModal}
                 setDate={setDate}
                 period={period}
                 completeTask={completeTask}
-                removeTask={removeTask}/>
+                removeTask={removeTask}
+                today={today}/>
         </StyledTasksPage>
     );
 };
@@ -233,6 +255,7 @@ const mapStateToProps = (state) => {
     return {
         tasks: state.tasks,
         selectedTask: state.selectedTask,
+        modalTaskState: state.modalTaskState,
         modalAddTaskState: state.modalAddTaskState,
         loading: state.loading,
         error: state.error

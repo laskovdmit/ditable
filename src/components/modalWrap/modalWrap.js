@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
+import { getScrollWidth } from '../../services/ditableService';
 
 const StyledModalWrap = styled.div`
     display: ${props => props.display};
@@ -67,27 +68,15 @@ const StyledModalWrap = styled.div`
     }
 `;
 
-const getScrollWidth = () => {
-    const div = document.createElement('div');
-
-    div.style.width = '50px';
-    div.style.height = '50px';
-    div.style.overflowY ='scroll';
-    div.style.visibility = 'hidden';
-
-    document.body.appendChild(div);
-    let scrollWidth = div.offsetWidth - div.clientWidth;
-    div.remove();
-
-    return scrollWidth;
-};
 
 const ModalWrap = ({display, closedFunc, children, width, height, first = false}) => {
-    
-    if (display) {
-        document.body.style.overflow = 'hidden';
-        document.body.style.marginRight = getScrollWidth() + 'px';
-    } 
+    useEffect(() => {
+        if (display) {
+            document.body.style.overflow = 'hidden';
+            document.body.style.marginRight = getScrollWidth() + 'px';
+        } 
+    }, [display]);
+
 
     if (first) {
         return (
