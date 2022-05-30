@@ -160,7 +160,7 @@ const TasksListItem = ({task, showModalTask, completeTask, removeTask, type}) =>
                     </div>
                 : null}
             </div>
-            <button title={task.type === "task" ? "Выполнить задачу" : "Выполнить подзадачу"} className="item__completeBtn" onClick={() => completeTask(task)}>
+            <button title={task.type === "task" ? "Выполнить задачу" : "Выполнить подзадачу"} className="item__completeBtn" onClick={() => removeTask(task)}>
                 <i className="fa-solid fa-check"></i>
             </button>
             <button title={task.type === "task" ? "Удалить задачу" : "Удалить подзадачу"} className="item__close" onClick={() => removeTask(task)}>

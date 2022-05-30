@@ -186,7 +186,7 @@ const ShowTaskModal = ({
                     hoverColor={color.hover}
                     activeColor={color.active}
                     onClick={() => {
-                        completeTask(task);
+                        removeTask(task);
                         closeModal();}}>
                     Выполнить
                 </StyledCompleteBtn>

@@ -42,7 +42,10 @@ const StyledOutlineBtn = styled.button`
 `;
 
 const StyledFirstBtn = styled(StyledBtn)`
+    width: 300px;
     padding: 15px 20px;
+    margin: 0 auto;
+
     font-size: 20px;
     font-weight: 500;
     box-shadow: none;
